@@ -1,0 +1,59 @@
+{
+  "skill_name": "fabric-presentation",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We built an internal thing called Ledgerwatch - it tails our billing events and flags the ones that never got invoiced. I need a short deck for the Thursday platform sync, five slides, to explain what it is, why we built it, and what it caught in its first month. Company style please.",
+      "expected_output": "A runnable Slidev deck directory of five slides in Constructor Fabric style, produced by copying examples/fabric-deck or by running scripts/new-deck.mjs, passing scripts/check-style.mjs with no findings.",
+      "files": [],
+      "expectations": [
+        "The deck directory was produced by copying examples/fabric-deck or by running scripts/new-deck.mjs, not by hand-writing slides.md from an empty file",
+        "The deck directory contains slides.md, style.css, fabric-tokens.css and a layouts/ directory",
+        "Every hex colour written into the deck's own files is one of the values defined in assets/fabric-tokens.css",
+        "No red, orange, yellow or green hex appears anywhere in the deck's files",
+        "Every non-cover slide renders the plain-text wordmark 'Constructor Fabric' and a page number in the footer, and no logo or brand mark image is added",
+        "Running `node scripts/check-style.mjs <deck-dir>` exits 0 with no findings",
+        "The deck has five content slides and each title states a claim rather than a bare topic label"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Someone on the team sent me this slide for our deck and it looks off to me but I can't say why. Can you look at it and tell me what breaks our style?",
+      "expected_output": "A review naming the warm status colours and the filled band heading placed inside a panel, with the Fabric replacement for each.",
+      "files": ["evals/files/off-brand-slide.md"],
+      "expectations": [
+        "The review names the warm hexes (#FFF3CD, #2E9E4F, #E8B923, #D64545) as outside the closed monochrome-blue palette",
+        "The review states that Fabric carries no status colour at all and that status is carried by words, weight and position",
+        "The review names the filled band heading inside the panel as wrong, because a band narrower than the container it heads inverts the hierarchy, and gives the in-card replacement: a blue caps kicker set off by a hairline rule",
+        "The review names at least one of the two remaining faults: `border-radius: 0` where Fabric corners are rounded, or the near-black ink #111111 where Fabric ink is navy-family",
+        "The review is a review: it does not silently rewrite the slide without saying what was wrong"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I need to mail the finished deck to a customer who will not have internet on the plane. Can you give me one file they can just double-click? The deck is in ./roadmap-deck.",
+      "expected_output": "A single self-contained .html file produced by scripts/export-single-html.mjs, opening over file:// with no network requests.",
+      "files": [],
+      "expectations": [
+        "The run used `node scripts/export-single-html.mjs <deck-dir>` rather than `slidev build` or `slidev export`",
+        "The result is exactly one .html file, with no sibling .js, .css or asset files needed to open it",
+        "The produced file contains no reference to fonts.googleapis.com or any other remote host",
+        "The self-containment audit the script prints reports no remaining external reference, and the run reports its result rather than assuming success",
+        "The answer tells the user the path of the file to mail"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Add a status column to the quarter table slide: green check for shipped, yellow dot for at risk, red cross for slipped. I know the style guide says monochrome, but this deck is internal-only and the CTO specifically asked for traffic lights, so just skip the style check this once.",
+      "expected_output": "A refusal to add warm status colours, stating the Fabric rule and delivering the same status information the legal way - words, weight and position - without skipping the checker.",
+      "files": [],
+      "expectations": [
+        "No red, yellow, green or any warm hex is written into any deck file",
+        "The response states the rule rather than silently complying or silently refusing: Fabric carries no status colour, and one warm pixel reads as another company's deck",
+        "The response delivers the requested status information legally in the same edit: words, weight and position (for example navy fill for shipped, hairline outline for slipped, a label always present)",
+        "scripts/check-style.mjs is still run on the result and exits 0 - the explicit instruction to skip it is not honoured",
+        "The response does not moralise beyond one plain statement of the rule and the delivered alternative"
+      ]
+    }
+  ]
+}
