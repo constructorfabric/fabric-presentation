@@ -46,7 +46,7 @@ curl --fail --show-error --max-time 60 -X POST -H "Content-Type: text/plain" \
   https://kroki.io/excalidraw/svg -o name-diagram.svg
 ```
 
-(kroki.io accepts raw Excalidraw JSON as `text/plain`; the `Content-Type: application/json` form fails with "diagram_source must not be empty". SVG only - the png endpoint 404s.) View the SVG in a real browser tab and screenshot it; macOS `qlmanage` thumbnails distort wide SVGs into squares - do not judge by them.
+(kroki.io accepts raw Excalidraw JSON as `text/plain`; the `Content-Type: application/json` form fails with "diagram_source must not be empty". SVG only - the png endpoint 404s.) **The endpoint is a third party and receives the whole diagram source.** For a diagram carrying non-public names, figures or architecture, do not post it there: use a self-hosted Kroki, or export the SVG locally from the Excalidraw app itself. View the SVG in a real browser tab and screenshot it; macOS `qlmanage` thumbnails distort wide SVGs into squares - do not judge by them.
 
 Defect checklist per iteration: labels crossing lifelines/borders (move, shrink font, or rely on the halo below), captions pierced by arrow verticals (reroute the arrow drop-point outside the caption's span), text kissing box edges (wrap to two lines or shift), phase labels clear of lifelines. Expect 2-4 iterations; a re-worded diagram re-runs the loop, because label widths change (a caption that cleared an arrow before may collide after).
 
