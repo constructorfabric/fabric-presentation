@@ -127,7 +127,7 @@ const SKIP_DIRS = new Set(['node_modules', '.git', 'dist', '.slidev', 'public', 
 
 const RE_HEX = /(^|[^\w&#])#([0-9a-fA-F]{3,8})\b/g;
 const RE_GRADIENT = /\b(linear|radial|conic|repeating-linear|repeating-radial)-gradient\s*\(/gi;
-const RE_RADIUS = /border(?:-(?:start|end)-(?:start|end))?(?:-[a-z]+)?-radius\s*:\s*([^;}\n]+)/gi;
+const RE_RADIUS = /border(?:-[a-z]+){0,2}-radius\s*:\s*([^;}\n]+)/gi;
 const RE_FONT = /font-family\s*:\s*([^;}\n]+)/gi;
 const RE_SHADOW = /\b(box|text)-shadow\s*:\s*([^;}\n]+)/gi;
 const RE_DROP_SHADOW = /\bfilter\s*:\s*([^;}\n]*drop-shadow[^;}\n]*)/gi;

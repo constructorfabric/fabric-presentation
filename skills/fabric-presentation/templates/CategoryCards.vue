@@ -100,8 +100,10 @@
     padding: var(--fx-card-pad);
   }
 
-  /* The flip for a tint slide (exm-11): white fill, same hairline. */
-  .tpl-cat_on-tint {
+  /* The flip for a tint slide (exm-11): white fill, same hairline. The class
+     lands on the component root through Vue fallthrough, so the rule reaches
+     down to the repeated cards rather than painting the container. */
+  .tpl-cats.tpl-cat_on-tint .tpl-cat {
     background: var(--fx-surface);
   }
 

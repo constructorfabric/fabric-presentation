@@ -37,7 +37,7 @@
     {
       name: 'First item',
       status: 'In progress',
-      current: true,
+      current: false,
       note: 'Two lines at most. What this item is, and what state it is in.',
     },
     {

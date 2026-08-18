@@ -132,9 +132,17 @@ if (argv.includes('--list') || argv.length === 0) {
 }
 
 const force = argv.includes('--force');
-const target = resolve(
-  argv.find((a, i) => !a.startsWith('--') && !['--name', '--cases', '--date'].includes(argv[i - 1])),
+const targetArg = argv.find(
+  (a, i) => !a.startsWith('--') && !['--name', '--cases', '--date'].includes(argv[i - 1]),
 );
+if (!targetArg) {
+  process.stderr.write(
+    'new-deck: no target directory given\n' +
+      'usage: node scripts/new-deck.mjs <target-dir> [--name "Deck title"] [--cases a,b] [--date "Month Year"] [--force]\n',
+  );
+  process.exit(2);
+}
+const target = resolve(targetArg);
 const deckTitle = value('--name', basename(target).replace(/[-_]+/g, ' '));
 const slug = basename(target)
   .toLowerCase()
