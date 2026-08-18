@@ -1,0 +1,235 @@
+/*
+ * Template case: deck-style.
+ *
+ * The deck-level stylesheet. It does the one job a component cannot: it puts
+ * the Fabric geometry onto the slide - the donors' zones, the footer band, the
+ * dark ground - for the layouts a Fabric deck carries in its own `layouts/`.
+ *
+ * A Fabric deck depends on no shared theme package. Its layouts are its own
+ * files, and the selectors below are theirs: `.deck-slide` and its three zones,
+ * drawn by `layouts/fabric.vue`, and the `.fx-section-slide` ground a section
+ * divider draws for itself.
+ *
+ * Copy it to the deck root as style.css (Slidev loads that file globally, after
+ * the theme), and copy ../assets/fabric-tokens.css into the deck root at the
+ * same time: the @import below expects it beside this file, and every colour,
+ * size and offset here comes from it. Take one file and not the other and each
+ * var() resolves to nothing, which invalidates the whole declaration it sits in
+ * - no error anywhere, and a deck of empty boxes.
+ *
+ * The law in one line: Fabric is a MONOCHROME BLUE system. Light slides are
+ * flat white with navy titles and rounded tint cards; cover, section, quote and
+ * closing sit on the navy gradient; every page carries a hairline rule, the
+ * 10pt bold wordmark "Constructor Fabric" and a page number. There is no red,
+ * no yellow, no green - status is carried by words, weight and position.
+ *
+ * Geometry is necessary but not sufficient: it says WHERE the zones are and
+ * nothing about what goes in them. The Fabric patterns live in the template
+ * cases in this directory (see README.md); take the case that matches the
+ * slide's shape rather than styling a bare component.
+ *
+ * `node scripts/new-deck.mjs` seeds a deck's style.css from this file and
+ * appends the rules the scaffolded layouts add on top of these zones.
+ */
+
+@import "./fabric-tokens.css";
+
+/* ---- 1. Canvas ------------------------------------------------------------
+ * --fx-scale rebases the whole pt ladder on the deck's canvas: the donors'
+ * slide is 1280px wide, Slidev's is 980, so 980/1280 = 0.7656. --fx-slide-h is
+ * the canvas height, and the zone rules need it because a block-direction
+ * percentage in CSS resolves against width.
+ */
+
+:root {
+  --fx-scale: 0.7656;
+  --fx-slide-h: 552px;
+}
+
+/* Slides that use a theme layout rather than one of the deck's own - a section
+   divider on `layout: none`, for instance - still take the brand face. */
+
+.slidev-layout {
+  font-family: var(--fx-font);
+}
+
+/* ---- 2. Geometry: the content slide's three zones --------------------------
+ * The donors' zones, drawn by the deck's own content layout. Margins 3.8%,
+ * title top 8.7%, content 22.7% to 89%, footer line at 92.3% - every one of
+ * them read from the zone tokens in fabric-tokens.css, so the geometry has one
+ * source. Nothing content-bearing may cross the 89% line, which is what the
+ * content box's bottom padding enforces.
+ *
+ * The 3.8% margin belongs to each ZONE - header, content, footer - and never to
+ * the slide root. A padded root insets the footer box too, and the footer's
+ * border-block-start then stops short of both slide edges; the rule spans the
+ * full slide width on every page; a dark layout that pads its root cuts the
+ * rule short at both ends.
+ *
+ * The footer is IN FLOW, which is what keeps the content box off it - an
+ * absolutely positioned footer lets content run underneath and the export clips
+ * whatever crosses it.
+ */
+
+.deck-slide {
+  display: flex;
+  flex-direction: column;
+  background: var(--fx-surface);
+  block-size: 100%;
+  color: var(--fx-text);
+  font-family: var(--fx-font);
+}
+
+.deck-slide-header {
+  flex: none;
+  block-size: calc(var(--fx-content-top) * var(--fx-slide-h));
+  padding-block: calc(var(--fx-title-top) * var(--fx-slide-h)) 0;
+  padding-inline: var(--fx-margin-inline);
+}
+
+.deck-slide-header h1 {
+  margin: 0;
+  color: var(--fx-text-title);
+  font-size: var(--fx-size-title);
+  font-weight: var(--fx-weight-bold);
+  letter-spacing: var(--fx-track-title-sm);
+  line-height: var(--fx-leading-title);
+}
+
+/* The takeaway line under the title, in the secondary blue: EXM sets one on
+   nearly every light slide, and it states the conclusion rather than the
+   topic. */
+
+.deck-slide-header .deck-takeaway {
+  margin-block: calc(4 * var(--fx-pt)) 0;
+  color: var(--fx-text-subtitle);
+  font-size: var(--fx-size-body);
+}
+
+/* The dead band between the content's 89% floor and the footer line at 92.3%
+   is the content box's bottom padding. */
+
+.deck-slide-content {
+  display: flex;
+  overflow: hidden;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  min-block-size: 0;
+  padding-block: 0
+    calc((var(--fx-footer-top) - var(--fx-content-bottom)) * var(--fx-slide-h));
+  padding-inline: var(--fx-margin-inline);
+}
+
+/* The footer is a HAIRLINE and two runs of text, not a band: the wordmark left,
+   the page number right, both 10pt in the muted blue-grey. There is no logo
+   image anywhere in the system - the wordmark IS the deck's brand mark.
+
+   ONE geometry on every page of the deck - same band, same baseline, same
+   padding. A dark page turns its hairline transparent and the cover drops its
+   page number; neither of them drops the BOX, because a footer that changes
+   size makes the wordmark jump as the deck advances. The band is what is left
+   of the slide under the footer line: 100% - 92.3%. */
+
+.deck-slide-footer {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  border-block-start: var(--fx-rule-hairline) solid var(--fx-rule);
+  block-size: calc((1 - var(--fx-footer-top)) * var(--fx-slide-h));
+  color: var(--fx-text-muted);
+  font-size: var(--fx-size-footer);
+  padding-block: 0;
+  padding-inline: var(--fx-margin-inline);
+}
+
+.deck-slide-footer .deck-footer-brand {
+  font-weight: var(--fx-weight-bold);
+}
+
+/* ---- 3. Deck furniture ----------------------------------------------------
+ * The kicker and the chip, in the brand face. Monospace belongs to literal code
+ * only, so neither of these takes it - weight, size and letter-spacing carry
+ * them instead.
+ */
+
+/* The caps line on a DARK page - the cover's occasion, the section divider's
+   number. It is a plain run of letters: a rule-and-label eyebrow
+   is not a Fabric shape.
+
+   It does not go above a content title: a pre-heading there repeats the claim
+   the title already states, and no donor content page carries one.
+   Inside a card the caps line is a different
+   element (.fx-card-head) and stays. */
+
+.deck-eyebrow {
+  color: var(--fx-text-accent);
+  font-size: var(--fx-size-kicker);
+  font-weight: var(--fx-weight-bold);
+  letter-spacing: var(--fx-track-caps);
+  line-height: 1.2;
+  margin-block-end: calc(6 * var(--fx-pt));
+  text-transform: uppercase;
+}
+
+/* On a dark ground the same line takes the sky blue instead (tpl-01/02). */
+.fx-dark .deck-eyebrow {
+  color: var(--fx-text-accent-dark);
+}
+
+/* The chip: a rounded label, hairline on white. Its filled variant is NAVY -
+   white bold on navy, never white on blue. */
+
+.deck-chip {
+  display: inline-flex;
+  align-items: center;
+  border: var(--fx-rule-hairline) solid var(--fx-rule);
+  border-radius: var(--fx-radius-pill);
+  background: var(--fx-surface);
+  color: var(--fx-text-muted);
+  font-size: var(--fx-size-caption);
+  line-height: 1.2;
+  padding-block: calc(3 * var(--fx-pt));
+  padding-inline: calc(10 * var(--fx-pt));
+}
+
+.deck-chip_filled {
+  border-color: var(--fx-navy);
+  background: var(--fx-navy);
+  color: var(--fx-text-inverted);
+  font-weight: var(--fx-weight-bold);
+}
+
+/* ---- 4. The dark slide ----------------------------------------------------
+ * Cover, section divider, quote and closing sit on the navy gradient, and the
+ * section-divider case draws its own zones at the donors' offsets - so it needs
+ * the slide box unpadded and POSITIONED. Its slide block carries
+ * `layout: none` + `class: fx-section-slide`; this is the rule that class
+ * needs. The gradient is legal here and in the ribbon illustration, nowhere
+ * else.
+ */
+
+.slidev-layout.fx-section-slide {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  background: var(--fx-grad-glow), var(--fx-grad-ground);
+  block-size: 100%;
+  color: var(--fx-text-inverted);
+}
+
+/* Literal code, and nothing else, takes the mono stack. */
+.deck-code {
+  font-family: var(--fx-font-mono); /* fx-code */
+  font-size: var(--fx-size-text);
+}
+
+/* Slidev keeps the "go to slide" dialog mounted and slides it off the top of
+   the window when closed - but its result list is not clipped, so the list
+   hangs back down over the top-right corner of every slide. Keyed off the
+   input's own disabled state, which the component sets while the dialog is
+   closed, so pressing g still brings the dialog and its list back. */
+#slidev-goto-dialog:has(#slidev-goto-input:disabled) .autocomplete-list {
+  display: none;
+}

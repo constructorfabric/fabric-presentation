@@ -1,0 +1,11 @@
+# Evals
+
+The regression test for this skill's instructions. A skill edit that reads better and performs worse is common, and re-reading it will not reveal that - a run will.
+
+**`evals.json`** - four scenarios in the schema Anthropic's `skill-creator` reads ([references/schemas.md](https://github.com/anthropics/skills/blob/main/skills/skill-creator/references/schemas.md)): build a deck, review an off-brand slide, export one self-contained file, and one adversarial case where the user explicitly asks to break the style and skip the checker - the class of case that actually finds anything, because a skill can state its own principle and still do the bad thing when asked nicely. Each scenario carries `expectations`, a list of statements a grader can check against the run's output. The input for the review case is [files/off-brand-slide.md](files/off-brand-slide.md), a slide carrying warm status colours, a filled band heading inside a panel, square corners and black ink.
+
+This is a golden set, not coverage. Run each prompt twice - once with the new version of the skill, once with the version you are replacing - and compare the pass rates; an edit that does not improve the run does not ship. When grading, rephrase the prompts and keep only the expectations fixed: output judged only against wording it has seen learns to pass the wording. Prefer the deterministic graders (`check-style.mjs` over the produced deck, the exporter's self-containment audit) over model judgment wherever an expectation allows it - a model grading a model passes plausible output. Re-run on every model change: an instruction that carried its weight on one model can be dead weight on the next.
+
+Description-trigger probes (`{"query": ..., "should_trigger": true|false}`) are NOT kept here: per `skill-creator`, they are working files of the description-tuning loop and live in a sibling `<skill-name>-workspace/` for the duration of that loop, not in the shipped skill. Write them when tuning the description, with near-miss negatives (an obviously irrelevant negative tests nothing), and let them go with the workspace.
+
+This file set is not a log. What a scenario used to expect, and why it changed, is in the commit that changed it.
