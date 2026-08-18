@@ -274,6 +274,7 @@ try {
 if (build.status !== 0) {
   process.stderr.write(build.stdout ?? '');
   process.stderr.write(build.stderr ?? '');
+  if (build.error) die(`could not run ${slidevBin}: ${build.error.message}`);
   die(`slidev build failed (exit ${build.status})`);
 }
 

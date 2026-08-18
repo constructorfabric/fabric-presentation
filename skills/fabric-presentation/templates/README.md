@@ -29,7 +29,7 @@ One case has no pair, because it is the deck rather than a slide: [deck-style.cs
 5. **Check the additions the case assumes.** A content slide's header holds the **title alone**, with the optional blue takeaway line under it - the caps eyebrow does not go above a content title, it belongs to dark pages and to card heads. The styles read `--fx-*` from [../assets/fabric-tokens.css](../assets/fabric-tokens.css), which the deck must import, with `--fx-scale: 0.7656` set once for Slidev's 980px canvas against the donors' 1280px slide.
 6. **Render the slide and look at it**, zoomed in, before deciding it works - and put it beside the donor page in the table above that it was built from. If yours reads lighter, something has dropped: check the deck defines every `--fx-*` the case reads, because one unresolved `var()` invalidates its whole declaration and a fill or a border disappears silently. Then run the conformance check from the skill root:
 
-   ```
+   ```sh
    node scripts/check-style.mjs <deck-dir>
    ```
 

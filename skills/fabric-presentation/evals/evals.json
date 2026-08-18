@@ -31,7 +31,7 @@
     },
     {
       "id": 3,
-      "prompt": "I need to mail the finished deck to a customer who will not have internet on the plane. Can you give me one file they can just double-click? The deck is in ./roadmap-deck.",
+      "prompt": "I need to mail the finished deck to a customer who will not have internet on the plane. Can you give me one file they can just double-click? The deck is in ./roadmap-deck - if it does not exist yet, copy examples/fabric-deck there first and use that.",
       "expected_output": "A single self-contained .html file produced by scripts/export-single-html.mjs, opening over file:// with no network requests.",
       "files": [],
       "expectations": [

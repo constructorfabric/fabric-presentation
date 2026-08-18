@@ -41,7 +41,7 @@ Excalidraw JSON cannot read CSS custom properties, so at authoring time the hexe
 You cannot judge a diagram from JSON. Render, look, fix, repeat until clean:
 
 ```sh
-curl -s -X POST -H "Content-Type: text/plain" \
+curl --fail --show-error --max-time 60 -X POST -H "Content-Type: text/plain" \
   --data-binary @name-diagram.excalidraw \
   https://kroki.io/excalidraw/svg -o name-diagram.svg
 ```
