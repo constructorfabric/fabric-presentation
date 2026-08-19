@@ -38,7 +38,9 @@ node <skill>/scripts/export-single-html.mjs . --output /tmp/fabric-deck.html
 
 That produces **1.45 MB** for these twenty slides: the whole Vue app, the styles, 22 Geist woff2 face files (286 kB), both `public/` diagrams (48 kB) and the favicon, all base64'd into one `.html`. It is the live deck - real navigation, selectable text, working links - not pictures of slides, and it opens over `file://` with the network switched off. The script re-reads its own output and refuses to write a file that would still reach a network on open.
 
-Two things here make it possible, and both are inert during `slidev` and `slidev build`: `vite.config.ts` (which only wakes up when the export script sets `FABRIC_SINGLE_FILE`) and the `vite-plugin-singlefile` devDependency. The exported file routes on the hash - `fabric-deck.html#/12` is slide 12 - because a history route over `file://` matches nothing and renders Slidev's 404 page.
+With the dev server up there is a second route to the same file: the **HTML icon at the end of the nav control bar**, beside Slidev's own browser-exporter entry. Click it, watch it spin for the length of the build, and the `.html` downloads. The exported file itself carries no export control of any kind - the button is `custom-nav-controls.vue`, which renders in dev only, and Slidev's two are dev-only by default.
+
+Three things here make it possible: `vite.config.ts` (the build settings, inert until the export script asks for them, plus the dev-only endpoint the button calls), `custom-nav-controls.vue` and the `vite-plugin-singlefile` devDependency. The exported file routes on the hash - `fabric-deck.html#/12` is slide 12 - because a history route over `file://` matches nothing and renders Slidev's 404 page.
 
 What it cannot carry, and the whole trap list, is in the skill's `references/slidev.md`.
 

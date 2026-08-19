@@ -31,10 +31,13 @@
  *                             some and the light pages' footers grow a nav
  *   components/SectionNav.vue that nav, mounted by the light layout only
  *   components/*.vue          the requested template cases, unchanged
- *   vite.config.ts            the single-file HTML export's build settings,
+ *   vite.config.ts            the single-file HTML export's build settings plus
+ *                             the dev-server endpoint its nav button calls,
  *                             copied verbatim from examples/fabric-deck so the
- *                             two can never drift; inert unless the export
- *                             script sets FABRIC_SINGLE_FILE
+ *                             two can never drift; the build half is inert
+ *                             unless the export script sets FABRIC_SINGLE_FILE
+ *   custom-nav-controls.vue   that button, in Slidev's own nav bar, likewise
+ *                             copied. Dev only, so no build carries it
  *   package.json .npmrc .gitignore README.md
  *
  * The deck is standalone: it carries its own layouts, stylesheet and tokens,
@@ -63,7 +66,7 @@ import {
   readdirSync,
   writeFileSync,
 } from 'node:fs';
-import { basename, dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -623,25 +626,41 @@ for (const name of requested) {
    the brand mark. The web's four-square BrandMark is not part of the deck
    system and goes on no slide, so nothing of it travels here. */
 
-/* ---- the single-file export's build settings -----------------------------
- * Copied rather than written out here: the canonical copy is the one the
- * example deck is actually exported from, so a fix proved there reaches every
- * scaffolded deck with no second edit. Without this file the export script
- * refuses to run, because Rollup would split the bundle into sibling chunks
- * and the "one file" would open as a blank page.
+/* ---- the single-file export: build settings, and its button ---------------
+ * Both copied rather than written out here: the canonical copies are the ones
+ * the example deck is actually exported from, so a fix proved there reaches
+ * every scaffolded deck with no second edit.
+ *
+ * vite.config.ts does two jobs, and the deck is missing half the export
+ * without it: the weld at build time (Rollup would otherwise split the bundle
+ * into sibling chunks and the "one file" would open as a blank page) and the
+ * dev-server endpoint the nav button calls.
+ *
+ * custom-nav-controls.vue is that button. Slidev mounts a file of this name
+ * from the deck root into its nav bar. It renders in dev only, so no build -
+ * the single-file export included - carries an export control.
  */
 
-const singleFileConfig = join(skill, 'examples', 'fabric-deck', 'vite.config.ts');
-if (existsSync(singleFileConfig)) {
-  copy(singleFileConfig, 'vite.config.ts');
-} else {
-  process.stderr.write(
-    'new-deck: examples/fabric-deck/vite.config.ts is missing - the deck is scaffolded\n' +
-      '          without the single-file HTML export. That is a bug in the skill.\n',
-  );
+for (const name of ['vite.config.ts', 'custom-nav-controls.vue']) {
+  const canonical = join(skill, 'examples', 'fabric-deck', name);
+  if (existsSync(canonical)) {
+    copy(canonical, name);
+  } else {
+    process.stderr.write(
+      `new-deck: examples/fabric-deck/${name} is missing - the deck is scaffolded\n` +
+        '          without the single-file HTML export. That is a bug in the skill.\n',
+    );
+  }
 }
 
 /* ---- project files ------------------------------------------------------- */
+
+/* Where the nav button's endpoint looks for the export script. A deck inside
+ * the skill needs no declaration - vite.config.ts walks up to it - and writing
+ * one there would only be a machine-local absolute path in a committed file. A
+ * deck scaffolded ANYWHERE ELSE has no way up, so it gets told, once, here.
+ * `FABRIC_SKILL_DIR` in the environment overrides this if the skill moves. */
+const insideSkill = `${target}${sep}`.startsWith(`${skill}${sep}`);
 
 write(
   'package.json',
@@ -650,6 +669,7 @@ write(
       name: `@constructor/${slug}`,
       type: 'module',
       private: true,
+      ...(insideSkill ? {} : { fabricSkill: skill }),
       scripts: {
         dev: 'slidev --open',
         build: 'slidev build',
@@ -714,20 +734,33 @@ pnpm exec slidev export --format pdf
 ## One file to mail
 
 For an audience that needs a file they can double-click, with no server and no
-folder of assets beside it:
+folder of assets beside it. Two routes to the same file:
+
+- **The nav button.** With the dev server up, the HTML icon in the control bar
+  at the bottom right. It spins for the length of the build and then the file
+  downloads. This is the route to reach for while presenting the deck at
+  someone.
+- **The command**, for a script or a release step:
 
 \`\`\`sh
 node ${join(skill, 'scripts', 'export-single-html.mjs')} . --output ${slug}.html
 \`\`\`
 
-That writes ONE \`.html\` - the live deck, not pictures of it - with the script,
+Either writes ONE \`.html\` - the live deck, not pictures of it - with the script,
 the styles, the webfont and every \`public/\` asset base64'd inside. It opens over
 \`file://\` with the network off; the script refuses to write a file that would
 still reach for a network on open. Reckon on 1.5 MB for a twenty-slide deck.
 
-Two things it needs, both already here: \`vite.config.ts\` (which does nothing
-until the export script sets \`FABRIC_SINGLE_FILE\`) and the
-\`vite-plugin-singlefile\` devDependency. What the file cannot carry is in the
+The exported file carries NO export controls, its own button included: that
+button renders in dev only, and Slidev's two (the browser exporter and
+download-as-PDF) are dev-only by default.
+
+Three things it needs, all already here: \`vite.config.ts\` (inert during a
+normal \`slidev build\`, and the host of the button's endpoint during \`slidev\`),
+\`custom-nav-controls.vue\` (the button), and the \`vite-plugin-singlefile\`
+devDependency.${insideSkill ? '' : ` \`package.json\` also names where the skill is,
+in \`"fabricSkill"\` - update it if the skill moves, or start the dev server with
+\`FABRIC_SKILL_DIR\` set to override it.`} What the file cannot carry is in the
 skill's \`references/slidev.md\`.
 
 ## Before finishing a round
@@ -757,8 +790,11 @@ in, beside the example page its shape came from.
 - \`sections.ts\` - the deck's sections, empty until the deck has some. Declare
   them and each light page's footer carries the names with the current one in
   the accent blue; a dark page never carries the nav.
-- \`vite.config.ts\` - the single-file HTML export's build settings, and nothing
-  else. It is inert during \`slidev\` and \`slidev build\`.
+- \`vite.config.ts\` - the single-file HTML export, and nothing else: the build
+  settings for the weld (inert unless the export script asks for it) and, in
+  dev, the endpoint the nav button calls.
+- \`custom-nav-controls.vue\` - that button, in Slidev's own nav bar. Dev only,
+  so no build carries it.
 - \`components/\` - \`SectionNav.vue\` plus the template cases copied in${requested.length > 0 ? `: ${requested.join(', ')}` : ' (none yet)'}.
   Take more with \`node ${join(skill, 'scripts', 'new-deck.mjs')} --list\`.
 - A content slide's header holds the title alone, with the optional blue
