@@ -66,7 +66,7 @@ import {
   readdirSync,
   writeFileSync,
 } from 'node:fs';
-import { basename, dirname, join, resolve, sep } from 'node:path';
+import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -669,7 +669,9 @@ write(
       name: `@constructor/${slug}`,
       type: 'module',
       private: true,
-      ...(insideSkill ? {} : { fabricSkill: skill }),
+      /* Relative, so the deck's package.json carries no machine-specific
+         path - a collaborator's checkout resolves it from the deck root. */
+      ...(insideSkill ? {} : { fabricSkill: relative(target, skill) || '.' }),
       scripts: {
         dev: 'slidev --open',
         build: 'slidev build',

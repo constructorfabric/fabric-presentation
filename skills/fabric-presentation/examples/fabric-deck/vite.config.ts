@@ -37,7 +37,9 @@
  *
  *   1. `FABRIC_SKILL_DIR` in the dev server's environment. The override: works
  *      anywhere, including a deck whose skill moved this morning.
- *   2. `"fabricSkill"` in the deck's own package.json. The persistent answer
+ *   2. `"fabricSkill"` in the deck's own package.json - relative to the deck
+ *      root (what the scaffolder writes, so no machine path is committed) or
+ *      absolute. The persistent answer
  *      for a copied-out deck; `new-deck.mjs` writes it when it scaffolds one
  *      outside the skill.
  *   3. An ancestor of this file that carries both `SKILL.md` and
@@ -106,7 +108,8 @@ const findSkill = () => {
 const NO_SKILL =
   'The fabric-presentation skill is not reachable from this deck, so the\n' +
   'single-file export cannot run. Point the deck at it in one of two ways:\n\n' +
-  '  - add "fabricSkill": "/absolute/path/to/fabric-presentation" to the\n' +
+  '  - add "fabricSkill": "<path to fabric-presentation, relative to the deck\n' +
+  '    or absolute>" to the\n' +
   "    deck's package.json, or\n" +
   '  - start the dev server with FABRIC_SKILL_DIR=/absolute/path/... set.\n\n' +
   'A deck sitting inside the skill needs neither: the config walks up to it.\n';
