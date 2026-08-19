@@ -40,11 +40,15 @@ Do this before the deck has content: it is the one dependency the whole delivery
 
 ## The deck as one self-contained HTML file
 
-Slidev has no such export. `slidev build` emits an SPA - an `index.html` plus hashed chunks plus `public/` - which is a blank page over `file://`, and `slidev export` flattens the deck to PDF, PNG or PPTX, which is pictures of slides. Where the audience needs a file to double-click and mail on, this skill builds the third thing:
+Slidev has no such export. `slidev build` emits an SPA - an `index.html` plus hashed chunks plus `public/` - which is a blank page over `file://`, and `slidev export` flattens the deck to PDF, PNG or PPTX, which is pictures of slides. Where the audience needs a file to double-click and mail on, this skill builds the third thing. Two routes to it, one file out of both:
 
 ```
 node scripts/export-single-html.mjs <deck-dir> --output <file>.html
 ```
+
+That is the scriptable route. The interactive one is the **HTML icon in the dev server's nav bar**, at the end of the control row beside Slidev's own browser-exporter entry: click it, wait out the build, and the file downloads. The button is `custom-nav-controls.vue` in the deck root and the endpoint it calls (`/__fabric/export-html`) is in the deck's `vite.config.ts`, because the export is a Node process and nothing in a browser can run it.
+
+**The exported file carries no export controls at all** - not this button, not Slidev's. The button is guarded on `import.meta.env.MODE`, and Slidev's two are dev-only already (`browserExporter: dev` by default; the download-as-PDF icon needs `download: true`). MODE rather than `DEV` for a reason worth knowing before you copy the pattern: Vite derives `import.meta.env.DEV` from NODE_ENV whenever NODE_ENV is set, so a build spawned from a dev server - which is exactly what the button does - would come out with `DEV` TRUE inside it, dev-runtime Vue and all. `MODE` follows the command instead.
 
 It is a BUILD, not a rendering: the live Vue app, with real navigation, selectable text and working links, welded into one file with its styles, its webfont and its `public/` assets base64'd inside. `examples/fabric-deck` came to **1.45 MB** for twenty slides. The script re-reads its own output and refuses to write a file that would still reach a network on open, so a false pass is not one of the outcomes.
 
@@ -57,6 +61,8 @@ Five things have to be defeated, and four of them fail silently:
 - **`public/` assets.** A `public/x.svg` is referenced as `/x.svg`, which over `file://` is the root of the disk. Vite does not rewrite those, because in an SPA they are right.
 - **The webfont.** `fonts.provider: google` puts a `fonts.googleapis.com` stylesheet in the head. Left there, the deck silently falls back to a system grotesque and every line length shifts. The stylesheet and its woff2 files are fetched at BUILD time and inlined - so the export needs the network even though the file it produces does not.
 - **The favicon.** Slidev's default is a jsdelivr URL, and it sits in two places: the `<link rel=icon>` and a string in the bundled config.
+
+One more, and it only bites the nav button: the export runs a `slidev build` over the directory the dev server is watching, and a build puts `index.html` and the throwaway `.slidev-single-file.md` into the deck root and takes them away again. Vite answers `index.html` with a full page reload, which kills the button's fetch while the build behind it runs happily to the end - a failure that leaves no error anywhere. The deck's `vite.config.ts` keeps both names out of `server.watch.ignored`.
 
 What the file cannot carry: anything fetched at runtime - Monaco (`{monaco}` code blocks), a PlantUML diagram, an `<iframe src>` to a live page; the presenter view and the speaker-notes UI, which are dev-server routes; and any persistence - drawings and click state live in memory. Speaker notes travel in the bundle as slide data but there is no UI in a built deck that shows them.
 

@@ -71,7 +71,7 @@ node scripts/new-deck.mjs <target-dir> [--name "Deck title"] [--cases a,b] [--da
 node scripts/new-deck.mjs --list
 ```
 
-It writes a runnable Fabric deck out of this skill's own material: `slides.md` with a dark cover and one content slide, `style.css` seeded from the templates with `fabric-tokens.css` beside it, the three `layouts/`, an empty `sections.ts` with `components/SectionNav.vue`, the requested template cases in `components/`, the `vite.config.ts` the single-file HTML export needs, and a `package.json` pinning the exact Slidev, Vue, theme and Playwright versions this skill pins. No logo file travels: the footer wordmark is the deck's only brand mark. It refuses a non-empty directory without `--force`, and it runs `check-style.mjs` over what it wrote before it reports.
+It writes a runnable Fabric deck out of this skill's own material: `slides.md` with a dark cover and one content slide, `style.css` seeded from the templates with `fabric-tokens.css` beside it, the three `layouts/`, an empty `sections.ts` with `components/SectionNav.vue`, the requested template cases in `components/`, the `vite.config.ts` and `custom-nav-controls.vue` the single-file HTML export needs, and a `package.json` pinning the exact Slidev, Vue, theme and Playwright versions this skill pins. No logo file travels: the footer wordmark is the deck's only brand mark. It refuses a non-empty directory without `--force`, and it runs `check-style.mjs` over what it wrote before it reports.
 
 **The fastest start is a copy.** [../examples/fabric-deck/](../examples/fabric-deck/) is a complete, runnable Fabric deck whose every slide is a different composition - cover, agenda, contrast pair, four-column flow, section dividers, big stats, command panel, prompt and stepper, two diagrams, two tables on one slide, timeline, comparison, team grid, image frame, card row, quote and closing - with placeholder content throughout and its own README mapping each slide to the case or donor layout it demonstrates. Copy the directory, run it, and delete the slides the deck does not need; the scaffolder is the better route only when you want the minimum rather than the menu.
 
@@ -86,7 +86,11 @@ It writes a runnable Fabric deck out of this skill's own material: `slides.md` w
 node scripts/export-single-html.mjs <deck-dir> --output <file>.html
 ```
 
-One `.html` that opens by double-click over `file://` with no network and nothing beside it - the live deck, not pictures of slides. Every Fabric deck can do this because `new-deck.mjs` writes the `vite.config.ts` and the `vite-plugin-singlefile` devDependency it needs, and both are inert until the export script sets `FABRIC_SINGLE_FILE`. A deck assembled by hand from an older copy has neither, and the script says so rather than producing a blank page. The traps, the size and what the file cannot carry are in [slidev.md](./slidev.md).
+One `.html` that opens by double-click over `file://` with no network and nothing beside it - the live deck, not pictures of slides. That command is the scriptable route; with the dev server up, the **HTML icon at the end of the nav control bar** is the same export by hand, and the file downloads when the build finishes. Nothing of either route appears inside the exported file - the button renders in dev only, and Slidev's own two export affordances are dev-only by default.
+
+Every Fabric deck can do this because `new-deck.mjs` writes `vite.config.ts` (the build settings, and in dev the endpoint the button calls), `custom-nav-controls.vue` (the button) and the `vite-plugin-singlefile` devDependency. A deck assembled by hand from an older copy has none of them, and the script says so rather than producing a blank page.
+
+A deck scaffolded OUTSIDE the skill also carries `"fabricSkill"` in its `package.json`, naming where the export script lives - a copied-out deck has no way of walking up to it. `FABRIC_SKILL_DIR` in the dev server's environment overrides that if the skill moves. A deck inside the skill needs neither. The traps, the size and what the file cannot carry are in [slidev.md](./slidev.md).
 
 ## Verification sweep for these decks
 
