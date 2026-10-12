@@ -7,32 +7,30 @@
  * not the other and every var() resolves to nothing, which invalidates the
  * whole declaration it sits in: no error anywhere, and a deck of empty boxes.
  *
- * The law it renders is ../../references/fabric-style.md, in one line: Fabric
- * is a MONOCHROME BLUE system. Light slides are flat white with navy titles and
- * rounded tint cards; cover, section, quote and closing sit on the navy
- * gradient; every page carries a hairline rule, the 10pt bold wordmark
- * "Constructor Fabric" and a page number. There is no red, no yellow, no green
- * - status is carried by words, weight and position.
+ * The law it renders is ../../references/fabric-style.md: designer's template
+ * v4 (ppt.constructor.rocks, 9 October 2026). Every coordinate here is the v4
+ * XML's own, in --fx-u (one pixel of the 1280 x 720 slide), and every frame is
+ * placed ABSOLUTELY, the way PowerPoint places it - so a slide can be checked
+ * against the template number for number, and v4-reference.md beside this file
+ * renders the template's own eleven example slides for exactly that check.
  *
  * The sections, in order:
  *
- *   1. Canvas            --fx-scale and the slide height the zone rules need
- *   2. Deck furniture    the chip
- *   3. The dark slide    the ground a section divider draws for itself
- *   4. The layouts       the three zones of layouts/fabric.vue, the footer and
- *                        the dark pages' ground
- *   5. This deck's own   card rows, the dark panel, the stepper, the four-column
- *                        flow, the tables, the diagram figure
+ *   1. Canvas            --fx-scale for Slidev's 980px canvas
+ *   2. Frames            the absolute text frame every layout places
+ *   3. The layouts       light slide, tint slide, dark slide, footer
+ *   4. Template shapes   cover, section, agenda, list, cards, stats, image,
+ *                        team, process, quote, closing, status table
+ *   5. This deck's own   card rows, the dark panel, the stepper, the flow,
+ *                        the tables, the diagram figure
  *   6. Play-view chrome  one piece of Slidev's own UI, suppressed
  */
 
 @import "./fabric-tokens.css";
 
 /* ---- 1. Canvas ------------------------------------------------------------
- * --fx-scale rebases the whole pt ladder on the deck's canvas: the donors'
- * slide is 1280px wide, Slidev's is 980, so 980/1280 = 0.7656. --fx-slide-h is
- * the canvas height, and the zone rules need it because a block-direction
- * percentage in CSS resolves against width.
+ * --fx-scale rebases the whole pt ladder - and --fx-u with it - on the deck's
+ * canvas: the template's slide is 1280px wide, Slidev's is 980, so 0.7656.
  */
 
 :root {
@@ -40,81 +38,82 @@
   --fx-slide-h: 552px;
 }
 
-/* Slides that use a theme layout rather than one of this deck's own - the
-   section dividers on `layout: none` - still take the brand face. */
-
 .slidev-layout {
   font-family: var(--fx-font);
 }
 
-/* ---- 2. Deck furniture ----------------------------------------------------
- * The kicker and the chip, in the brand face. Monospace belongs to literal code
- * only, so neither of these takes it - weight, size and letter-spacing carry
- * them instead.
+/* ---- 2. Frames -------------------------------------------------------------
+ * A text frame at the template's own coordinates: set --x, --y and --w (and
+ * --h where the frame anchors its text) in 1280-canvas pixels and the frame
+ * lands where the XML puts it, with PowerPoint's default 9.6 / 4.8 text inset.
  */
 
-.deck-chip {
-  display: inline-flex;
-  align-items: center;
-  border: var(--fx-rule-hairline) solid var(--fx-rule);
-  border-radius: var(--fx-radius-pill);
-  background: var(--fx-surface);
-  color: var(--fx-text-muted);
-  font-size: var(--fx-size-caption);
-  line-height: 1.2;
-  padding-block: calc(3 * var(--fx-pt));
-  padding-inline: calc(10 * var(--fx-pt));
+.deck-frame {
+  position: absolute;
+  margin: 0;
+  inline-size: calc(var(--w) * var(--fx-u));
+  inset-block-start: calc(var(--y) * var(--fx-u));
+  inset-inline-start: calc(var(--x) * var(--fx-u));
+  padding: var(--fx-inset-y) var(--fx-inset-x);
 }
 
-/* ---- 3. The dark slide ----------------------------------------------------
- * Cover, section divider, quote and closing sit on the navy gradient, and the
- * section-divider case draws its own zones at the donors' offsets - so it needs
- * the slide box unpadded and POSITIONED. Its slide block carries
- * `layout: none` + `class: fx-section-slide`; this is the rule that class
- * needs. The gradient is legal here and in the ribbon illustration, nowhere
- * else.
- *
- * A divider is not only a bookend: a deck of several parts opens each part with
- * one, so this ground recurs through the middle of the deck.
- */
-
-.slidev-layout.fx-section-slide {
-  position: relative;
-  overflow: hidden;
-  padding: 0;
-  background: var(--fx-grad-glow), var(--fx-grad-ground);
-  block-size: 100%;
-  color: var(--fx-text-inverted);
+.deck-frame_h {
+  display: flex;
+  flex-direction: column;
+  block-size: calc(var(--h) * var(--fx-u));
 }
 
-/* ---- 4. The deck's own layouts --------------------------------------------
- * layouts/fabric.vue, layouts/fabric-cover.vue and layouts/fabric-dark.vue are
- * this deck's own, so their rules live here rather than in a theme. Every
- * offset below is read from the zone tokens in fabric-tokens.css rather than
- * written out again: title top 8.7%, content from 22.7% down to 89%, the footer
- * line at 92.3%. The footer is IN FLOW, which is what keeps the content box off
- * it - an absolutely positioned footer lets content run underneath and the
- * export clips whatever crosses it.
+.deck-frame_middle {
+  justify-content: center;
+}
+
+/* A box - a card, a table, an image frame - sits on the same coordinates with
+   no text inset of its own. */
+
+.deck-box {
+  position: absolute;
+  margin: 0;
+  block-size: calc(var(--h) * var(--fx-u));
+  inline-size: calc(var(--w) * var(--fx-u));
+  inset-block-start: calc(var(--y) * var(--fx-u));
+  inset-inline-start: calc(var(--x) * var(--fx-u));
+}
+
+/* ---- 3. The layouts ---------------------------------------------------------
+ * layouts/fabric.vue (light), layouts/fabric-cover.vue, layouts/fabric-section
+ * .vue and layouts/fabric-dark.vue (quote, closing). Each root is the whole
+ * canvas, unpadded and positioned; the title, the content box and the footer
+ * are absolute frames at the template's coordinates.
  */
 
 .deck-slide {
-  display: flex;
-  flex-direction: column;
+  position: relative;
+  overflow: hidden;
   background: var(--fx-surface);
   block-size: 100%;
   color: var(--fx-text);
   font-family: var(--fx-font);
 }
 
+/* The Agenda layout is the one light layout on the tint ground. */
+
+.deck-slide_tint {
+  background: var(--fx-surface-tint);
+}
+
+/* The title frame: x=48, y=52.8, 960 wide (v4-03..08), 32pt bold navy, spc
+   -50, one line. */
+
 .deck-slide-header {
-  flex: none;
-  block-size: calc(var(--fx-content-top) * var(--fx-slide-h));
-  padding-block: calc(var(--fx-title-top) * var(--fx-slide-h)) 0;
-  padding-inline: var(--fx-margin-inline);
+  position: absolute;
+  inline-size: calc(960 * var(--fx-u));
+  inset-block-start: var(--fx-title-y);
+  inset-inline-start: var(--fx-box-x);
+  padding: var(--fx-inset-y) var(--fx-inset-x);
 }
 
 .deck-slide-header h1 {
-  margin: 0;
+  margin: calc(var(--fx-lead-title) * 1em) 0 0;
   color: var(--fx-text-title);
   font-size: var(--fx-size-title);
   font-weight: var(--fx-weight-bold);
@@ -122,39 +121,40 @@
   line-height: var(--fx-leading-title);
 }
 
+/* The content box: x=48..1232, from y=163.2 (where every card row and table
+   starts) to y=649.9 (the full-image card's bottom). Content sits at the TOP
+   of it, as it does in every v4 layout; nothing is centred vertically. */
+
 .deck-slide-content {
+  position: absolute;
   display: flex;
-  overflow: hidden;
-  flex: 1;
   flex-direction: column;
-  justify-content: center;
-  min-block-size: 0;
-  padding-block: 0
-    calc((var(--fx-footer-top) - var(--fx-content-bottom)) * var(--fx-slide-h));
-  padding-inline: var(--fx-margin-inline);
+  block-size: calc(var(--fx-content-end) - var(--fx-content-y));
+  inline-size: var(--fx-box-w);
+  inset-block-start: var(--fx-content-y);
+  inset-inline-start: var(--fx-box-x);
 }
 
-/* The footer is a hairline rule and two runs of text: the wordmark at the left
-   margin, the page number at the right, and between them the section nav on a
-   light page. No band, no logo image - in this system the wordmark IS the brand
-   mark, on every page.
-
-   ONE geometry on every page - same band, same baseline, same padding-inline.
-   The dark pages use this same box: the ground turns the hairline transparent
-   and the cover drops its number, and neither drops the box, because a footer
-   that changes size makes the wordmark jump as the deck advances. */
+/* The footer is two runs of 10pt text and nothing else - no rule, no band, no
+   logo image: the bold wordmark at x=57.6, the page number right-aligned to
+   1222.4, both centred in the frame y=664.3..693.1. Muted #6E7B8C on light,
+   #A9BEDD on dark. The cover carries no number; every other page does,
+   unpadded. */
 
 .deck-slide-footer {
+  position: absolute;
   display: flex;
-  flex: none;
   align-items: center;
   justify-content: space-between;
-  border-block-start: var(--fx-rule-hairline) solid var(--fx-rule);
-  block-size: calc((1 - var(--fx-footer-top)) * var(--fx-slide-h));
+  block-size: var(--fx-footer-h);
   color: var(--fx-text-muted);
   font-size: var(--fx-size-footer);
   gap: calc(20 * var(--fx-pt));
-  padding-inline: var(--fx-margin-inline);
+  inline-size: var(--fx-box-w);
+  inset-block-start: var(--fx-footer-y);
+  inset-inline-start: var(--fx-box-x);
+  line-height: 1;
+  padding-inline: var(--fx-inset-x);
 }
 
 .deck-slide-footer .deck-footer-brand {
@@ -164,14 +164,14 @@
 
 .deck-slide-footer .deck-page-number {
   flex: none;
+  margin-inline-start: auto;
   font-variant-numeric: tabular-nums;
-  min-inline-size: 20px;
   text-align: end;
 }
 
-/* The section names, between the wordmark and the number, on LIGHT pages only -
-   a filled or dark page keeps a wordmark-only footer. This is our own
-   convention, not a donor shape: no tpl or exm page carries one. */
+/* An opt-in section nav between the two runs. Not a template shape - v4's
+   footer is the wordmark and the number only - so sections.ts ships empty and
+   the nav renders nothing until a deck fills it. */
 
 .deck-footer-nav {
   display: flex;
@@ -188,190 +188,457 @@
   white-space: nowrap;
 }
 
-/* The section the deck is in: the accent blue, bold. One marked item and the
-   rest in the footer grey - two marks send the eye hunting. */
-
 .deck-footer-nav-item_current {
   color: var(--fx-text-accent);
   font-weight: var(--fx-weight-bold);
 }
 
-/* The cover is a DARK slide: the navy gradient with the corner glow the donors
-   ship as a jpeg, a sky-blue eyebrow, a 64pt white title, the subtitle in the
-   pale tint and the author line in the muted blue.
+/* The dark ground: cover, section divider, quote and closing. The vertical
+   navy ramp the template ships as a jpeg; no glow. */
 
-   The ROOT carries no inline padding. The 3.8% margin belongs to the content
-   wrapper inside it, because a padded root insets everything the slide holds -
-   the footer included - and the footer's hairline then stops short of both
-   slide edges. The rule spans the full slide width on every page. */
-
-.deck-cover {
+.deck-dark {
   position: relative;
-  display: flex;
   overflow: hidden;
-  flex-direction: column;
-  background: var(--fx-grad-glow), var(--fx-grad-ground);
+  background: var(--fx-grad-ground);
   block-size: 100%;
   color: var(--fx-text-inverted);
   font-family: var(--fx-font);
 }
 
-/* Everything the cover says sits in this wrapper, and the wrapper carries the
-   margin. The closing's own wrapper, .deck-dark-body below, does the same job
-   beside a full-width footer. */
-
-.deck-cover-body {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: center;
-  min-block-size: 0;
-  padding-inline: var(--fx-margin-inline);
+.deck-dark .deck-slide-footer {
+  color: var(--fx-text-muted-dark);
 }
 
-.deck-cover-eyebrow {
-  margin: 0 0 calc(10 * var(--fx-pt));
+/* ---- 4. Template shapes -------------------------------------------------------
+ * One block per v4 layout, every number from the XML (scratch dumps of
+ * slideLayoutN.xml / slideN.xml). Frames are placed with .deck-frame and the
+ * --x / --y / --w custom properties in the markup.
+ */
+
+/* Cover (v4-01): eyebrow 13pt bold sky caps spc 200 at y=163.2; title 64pt
+   bold white spc -100 at y=201.6, 1084.8 wide; subtitle 18pt #E6EFFA at
+   y=436.8; author line 12pt #A9BEDD at y=585.6. Section divider (v4-02):
+   eyebrow at y=230.4, title 42pt at y=273.6, summary 15pt at y=412.8. */
+
+/* The single-spaced body frames of the dark pages - eyebrow, subtitle, author,
+   summary, contacts, quote - sit 0.12em lower than CSS puts them. */
+
+.deck-eyebrow,
+.deck-cover-subtitle,
+.deck-cover-author,
+.deck-section-summary,
+.deck-quote-text,
+.deck-quote-by {
+  padding-block-start: calc(var(--fx-inset-y) + var(--fx-lead-single) * 1em);
+}
+
+.deck-eyebrow {
   color: var(--fx-text-accent-dark);
   font-size: var(--fx-size-eyebrow);
   font-weight: var(--fx-weight-bold);
   letter-spacing: var(--fx-track-caps);
-  line-height: 1.2;
+  line-height: var(--fx-leading-single);
   text-transform: uppercase;
 }
 
-/* The title sits tight, so the space under it is padding rather than the
-   line's own leading - without it the subtitle sits on the descenders. */
-
-.deck-cover h1 {
-  margin: 0;
-  font-size: var(--fx-size-cover);
+.deck-dark h1 {
+  margin: calc(var(--fx-lead-title) * 1em) 0 0;
+  color: var(--fx-text-inverted);
   font-weight: var(--fx-weight-bold);
   letter-spacing: var(--fx-track-title);
   line-height: var(--fx-leading-title);
-  max-inline-size: 84.8%;
-  padding-block-end: calc(14 * var(--fx-pt));
 }
 
-/* The cover carries the same footer BOX as every other page - it is what keeps
-   the wordmark from moving when the deck leaves the cover - and differs from a
-   content page in one thing: it has no page number (tpl-01). */
-
-/* ---- 5. This deck's own furniture -----------------------------------------
- * Anatomy that more than one slide uses lives here once rather than as a scoped
- * copy per component: the card row, the dark mono panel, the numbered stepper,
- * the four-column flow, the table and the diagram figure. Anything a single
- * slide needs stays in that slide's own component.
- *
- * The Fabric cases these shapes came from: category-cards (the rounded tint
- * card with its accent-blue caps kicker), contrast-pair (the navy panel against
- * the tint card), terminal-flow (the dark gradient panel, the only place the
- * mono face is legal), quarter-table (the navy header band over zebra rows) and
- * tpl-17 (the numbered navy circle on a hairline rail). Nothing below
- * introduces a colour: every value is a token.
- */
-
-/* The header zone keeps the donors' 22.7% as a MINIMUM rather than a fixed
-   height, so a title that does need a second line pushes the content box down
-   instead of being clipped by it. It holds the title alone: the caps eyebrow
-   over a content title is not a Fabric shape. */
-
-.deck-slide-header {
-  block-size: auto;
-  min-block-size: calc(var(--fx-content-top) * var(--fx-slide-h));
+.deck-cover-title h1 {
+  font-size: var(--fx-size-cover);
 }
 
-/* ---- The slide body -------------------------------------------------------
- * One column: the picture, then the takeaway line. The picture takes the room
- * that is left, which keeps a card row filling the content box instead of
- * floating in the middle of it.
- */
-
-.deck-body {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: center;
-  font-family: var(--fx-font);
-  inline-size: 100%;
-  min-block-size: 0;
+.deck-section-title h1 {
+  font-size: var(--fx-size-section);
 }
 
-/* The conclusion under the picture, in the takeaway blue. The donors set this
-   line under the title; here it closes the slide, because in this deck each of
-   these sentences is a conclusion drawn FROM the picture. */
+.deck-closing-title h1 {
+  font-size: var(--fx-size-closing);
+}
 
-.deck-takeaway-line {
-  flex: none;
-  margin-block: calc(14 * var(--fx-pt)) 0;
-  color: var(--fx-text-subtitle);
+.deck-cover-subtitle {
+  color: var(--fx-tint-band);
+  font-size: var(--fx-size-body-lg);
+  line-height: var(--fx-leading-single);
+}
+
+.deck-cover-author {
+  color: var(--fx-text-muted-dark);
+  font-size: var(--fx-size-caption);
+  line-height: var(--fx-leading-single);
+}
+
+.deck-section-summary,
+.deck-closing-contacts {
+  color: var(--fx-tint-band);
+  font-size: var(--fx-size-lead);
+  line-height: var(--fx-leading-single);
+}
+
+.deck-closing-contacts {
+  line-height: var(--fx-leading-wide);
+}
+
+.deck-closing-contacts p {
+  margin: 0;
+}
+
+.deck-closing-contacts p:first-child {
+  margin-block-start: calc(var(--fx-lead-wide) * 1em);
+}
+
+.deck-closing-contacts p + p {
+  margin-block-start: var(--fx-space-before);
+}
+
+/* Quote (layout 21): the quote 32pt regular white spc -50 at x=105.6 y=182.4,
+   1065.6 wide; the attribution 15pt bold sky at y=470.4. */
+
+.deck-quote-text {
+  color: var(--fx-text-inverted);
+  font-size: var(--fx-size-title);
+  letter-spacing: var(--fx-track-title-sm);
+  line-height: var(--fx-leading-single);
+}
+
+.deck-quote-by {
+  color: var(--fx-text-accent-dark);
+  font-size: var(--fx-size-lead);
+  font-weight: var(--fx-weight-bold);
+  line-height: var(--fx-leading-single);
+}
+
+/* Agenda (layout 4, tint ground): one frame at y=163.2, 883.2 wide, rows of
+   17pt ink at lnSpc 170% - number, three spaces, item, dash, minutes - plain
+   text, no rules, no second colour. */
+
+.deck-agenda {
+  color: var(--fx-text);
+  font-size: var(--fx-size-agenda);
+  line-height: var(--fx-leading-agenda);
+  list-style: none;
+  white-space: pre;
+}
+
+/* Key points (v4-03, layout List): a frame at y=192, 912 wide; 16pt ink at
+   lnSpc 160%, a round bullet hanging 29.3 left of the text. */
+
+.deck-points {
+  padding-inline-start: calc(var(--fx-inset-x) + 29.3 * var(--fx-u));
+  color: var(--fx-text);
   font-size: var(--fx-size-body);
-  line-height: var(--fx-leading-body);
+  line-height: var(--fx-leading-list);
+  list-style: none;
 }
 
-/* ---- Card rows ------------------------------------------------------------ */
+.deck-points li {
+  position: relative;
+}
 
-/* The row keeps its natural height rather than stretching to the content box:
-   grown, the shortest card in the set is two thirds air, and a card that is
-   mostly empty reads as weight the slide did not mean to give it. */
+.deck-points li:first-child {
+  margin-block-start: calc(var(--fx-lead-list) * 1em);
+}
 
-.deck-cards {
+.deck-agenda li:first-child {
+  margin-block-start: calc(var(--fx-lead-agenda) * 1em);
+}
+
+.deck-agenda li + li {
+  margin-block-start: var(--fx-space-before);
+}
+
+.deck-points li + li {
+  margin-block-start: var(--fx-space-before);
+}
+
+.deck-points li:before {
+  position: absolute;
+  content: "\2022";
+  font-family: arial, sans-serif;
+  inset-inline-start: calc(-29.3 * var(--fx-u));
+}
+
+/* Column cards (v4-06/07, layouts Two/Three/Four Columns, Comparison): cards
+   297.6 high from y=163.2 on a 28.8 gutter; inside, the kicker and 8pt under
+   it the body - 15pt in two columns, 14pt in three, 13pt in four, all at lnSpc
+   130%; the Comparison body is 15pt at lnSpc 150%. */
+
+.deck-cols {
   display: grid;
   flex: none;
-  align-items: stretch;
-  gap: calc(14 * var(--fx-pt));
-  min-block-size: 0;
+  gap: var(--fx-gutter);
 }
 
-.deck-cards_5 {
-  grid-template-columns: repeat(5, 1fr);
+.deck-cols_2 {
+  grid-template-columns: repeat(2, 1fr);
 }
 
-.deck-cards .fx-card {
-  padding: calc(14 * var(--fx-pt));
+.deck-cols_3 {
+  grid-template-columns: repeat(3, 1fr);
 }
 
-/* Two lines of room whether the name takes one or two: five bodies starting on
-   the same line is what makes the row read as one set rather than five cards
-   placed side by side. */
-
-.deck-cards_5 .deck-card-title {
-  min-block-size: calc(2.4 * var(--fx-size-body));
+.deck-cols_4 {
+  grid-template-columns: repeat(4, 1fr);
 }
 
-.deck-card-title {
-  margin: 0;
-  color: var(--fx-text-title);
-  font-size: var(--fx-size-body);
-  font-weight: var(--fx-weight-bold);
-  letter-spacing: var(--fx-track-title-sm);
-  line-height: 1.2;
+.deck-cols .fx-card {
+  block-size: var(--fx-card-h);
 }
 
 .deck-card-body {
   margin: 0;
   color: var(--fx-text);
   font-size: var(--fx-size-text);
+  line-height: var(--fx-leading-card);
+}
+
+.deck-cols_2 .deck-card-body {
+  font-size: var(--fx-size-lead);
+}
+
+.deck-cols_4 .deck-card-body {
+  font-size: var(--fx-size-table);
+}
+
+
+.deck-compare .deck-card-body {
+  font-size: var(--fx-size-lead);
+  line-height: var(--fx-leading-wide);
+}
+
+/* Big Stats (layout 14): three cards 249.6 high starting at y=249.6 - 86.4
+   below the content top - the 40pt bold navy number centred, its label
+   centred under it. */
+
+.deck-stats {
+  margin-block-start: calc(86.4 * var(--fx-u));
+}
+
+.deck-stats .fx-card {
+  align-items: center;
+  block-size: calc(249.6 * var(--fx-u));
+  text-align: center;
+}
+
+/* Image frames (layouts Image, Image Full, Image Half, Image + Text): a card
+   standing where the picture goes, the picture filling it to the corner. */
+
+.deck-image {
+  overflow: hidden;
+  border: var(--fx-rule-card) solid var(--fx-rule);
+  border-radius: var(--fx-radius);
+  background: var(--fx-surface-tint);
+}
+
+.deck-image img,
+.deck-image svg {
+  display: block;
+  block-size: 100%;
+  inline-size: 100%;
+  object-fit: cover;
+}
+
+.deck-image-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  block-size: 100%;
+  color: var(--fx-text-muted);
+  font-size: var(--fx-size-eyebrow);
+  font-weight: var(--fx-weight-bold);
+  letter-spacing: var(--fx-track-label);
+  text-transform: uppercase;
+}
+
+.deck-image-caption {
+  color: var(--fx-text);
+  font-size: var(--fx-size-body);
   line-height: var(--fx-leading-body);
 }
 
-/* Depth marks the one card that matters, and only one card per slide takes it:
-   the navy fill, the sky-blue kicker a dark ground needs, white bold title. */
-
-.fx-card_filled {
-  border-color: var(--fx-navy);
-  background: var(--fx-navy);
+.deck-image-caption > :first-child {
+  margin-block-start: calc(var(--fx-lead-middle) * 1em);
 }
 
-.fx-card_filled .fx-kicker {
-  color: var(--fx-text-accent-dark);
+/* Team (layout 17): four 274.4-wide columns at x=48 / 351.2 / 654.4 / 957.6;
+   a 96px photo circle (#E6EFFA, 1pt hairline) centred in each, rows at
+   y=163.2 and 395.5; name and role under it in 14pt bold navy, centred, the
+   frame 115.2 below the photo's top. */
+
+.deck-team-photo {
+  position: absolute;
+  overflow: hidden;
+  border: var(--fx-rule-card) solid var(--fx-rule);
+  border-radius: 50%;
+  background: var(--fx-tint-band);
+  block-size: var(--fx-photo-size);
+  inline-size: var(--fx-photo-size);
+  inset-block-start: calc(var(--y) * var(--fx-u));
+  inset-inline-start: calc((var(--x) + 89.2) * var(--fx-u));
 }
 
-.fx-card_filled .deck-card-title {
-  color: var(--fx-text-inverted);
+.deck-team-photo span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  block-size: 100%;
+  color: var(--fx-text-title);
+  font-size: var(--fx-size-heading);
+  font-weight: var(--fx-weight-bold);
 }
 
-.fx-card_filled .deck-card-body {
-  color: var(--fx-tint-band);
+.deck-team-name {
+  color: var(--fx-text-title);
+  font-size: var(--fx-size-text);
+  font-weight: var(--fx-weight-bold);
+  line-height: var(--fx-leading-single);
+  text-align: center;
+}
+
+.deck-team-name p {
+  margin: 0;
+}
+
+/* Process (layout 18): a 1.5pt #DCE3EE rail at y=275 from x=196 to 1084;
+   52.8 navy circles at y=249.6 with 16pt bold white numbers; step name 14pt
+   bold navy centred at y=331.2 and its note 11pt muted centred at lnSpc 130%
+   at y=374.4, both frames 267.2 wide. */
+
+.deck-process-rail {
+  background: var(--fx-rule);
+  block-size: var(--fx-rule-rail);
+}
+
+.deck-process-name {
+  color: var(--fx-text-title);
+  font-size: var(--fx-size-text);
+  font-weight: var(--fx-weight-bold);
+  line-height: var(--fx-leading-single);
+  text-align: center;
+}
+
+.deck-process-note {
+  color: var(--fx-text-muted);
+  font-size: var(--fx-size-step);
+  line-height: var(--fx-leading-card);
+  text-align: center;
+}
+
+/* Logos (layout 20): six cards 177.3 x 96 at y=345.6 on a 24 gutter. */
+
+.deck-logos {
+  display: grid;
+  gap: calc(24 * var(--fx-u));
+  grid-template-columns: repeat(6, 1fr);
+  margin-block-start: calc(182.4 * var(--fx-u));
+}
+
+.deck-logos .fx-card {
+  align-items: center;
+  justify-content: center;
+  block-size: calc(96 * var(--fx-u));
+  color: var(--fx-text-muted);
+  font-size: var(--fx-size-step);
+  font-weight: var(--fx-weight-bold);
+  letter-spacing: var(--fx-track-kicker);
+  text-transform: uppercase;
+}
+
+/* A sub-heading on a content slide (v4-10/11): 20pt bold navy. */
+
+.deck-heading {
+  margin: 0;
+  color: var(--fx-text-title);
+  font-size: var(--fx-size-heading);
+  font-weight: var(--fx-weight-bold);
+  line-height: var(--fx-leading-single);
+}
+
+/* The guide pages' tables (v4-10/11) set their cells larger than the layout's
+   own table: 16pt body, 14pt header, margins 14 / 12 / 14 / 10, text centred
+   vertically, rows 57.5 high. */
+
+.deck-guide-table th,
+.deck-guide-table td {
+  block-size: calc(57.5 * var(--fx-u));
+  font-size: var(--fx-size-body);
+  padding: calc(12 * var(--fx-u)) calc(14 * var(--fx-u)) calc(10 * var(--fx-u));
+  vertical-align: middle;
+}
+
+.deck-guide-table thead th {
+  font-size: var(--fx-size-text);
+}
+
+/* The guide pages' own furniture (v4-10/11): the swatch cell (white bold
+   16pt on the colour itself), the 18pt lead lines, the 16pt body lines, and
+   tables whose rows do not alternate. Their grid is 0.6pt, not 0.75. */
+
+.deck-guide-table th,
+.deck-guide-table td {
+  border-width: max(0.8px, calc(0.6 * var(--fx-pt)));
+}
+
+.deck-swatches td {
+  block-size: calc(77 * var(--fx-u));
+}
+
+.deck-swatches_short td {
+  block-size: calc(55 * var(--fx-u));
+}
+
+.fx-table.deck-swatches tbody tr:nth-child(even),
+.fx-table .deck-guide-plain tr:nth-child(even) {
+  background: var(--fx-surface);
+}
+
+.deck-swatch {
+  color: var(--fx-white);
+  font-weight: var(--fx-weight-bold);
+}
+
+.deck-guide-sub,
+.deck-guide-lead {
+  color: var(--fx-text-title);
+  font-size: var(--fx-size-body-lg);
+  line-height: var(--fx-leading-single);
+}
+
+.deck-guide-lead {
+  font-weight: var(--fx-weight-bold);
+}
+
+.deck-guide-body {
+  color: var(--fx-text);
+  font-size: var(--fx-size-body);
+  line-height: var(--fx-leading-single);
+}
+
+.deck-guide-body p {
+  margin: 0;
+}
+
+/* ---- 5. This deck's own furniture -----------------------------------------
+ * Compositions the template has no layout for - the contrast pair, the
+ * four-layer flow, the dark command panel, the stepper - built from the
+ * template's own parts: its card (corner, 1pt border, 36.5 / 28.8 inset), its
+ * navy, its step circle, its type ladder. Nothing here adds a colour.
+ */
+
+/* The body of a deck-own composition: one column filling the content box from
+   its top, the way every template layout fills it. */
+
+.deck-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  inline-size: 100%;
+  min-block-size: 0;
 }
 
 /* ---- Literal code ---------------------------------------------------------
@@ -386,7 +653,6 @@
   font-size: 0.94em;
 }
 
-.fx-card_filled code,
 .deck-prompt code {
   color: inherit;
 }
@@ -512,9 +778,9 @@
 
 .deck-step-who {
   color: var(--fx-text-muted);
-  font-size: var(--fx-size-step);
+  font-size: var(--fx-size-kicker);
   font-weight: var(--fx-weight-bold);
-  letter-spacing: var(--fx-track-caps);
+  letter-spacing: var(--fx-track-kicker);
   line-height: 1.2;
   margin-block-start: calc(4 * var(--fx-pt));
   text-transform: uppercase;
@@ -547,12 +813,23 @@
 
 /* ---- Chip rows ------------------------------------------------------------ */
 
+/* A row of short facts under a panel: muted 12pt text run together with a
+   middle dot between items. Not a pill row - v4 draws no outlined chips. */
+
 .deck-chips {
   display: flex;
   flex: none;
   flex-wrap: wrap;
-  gap: calc(8 * var(--fx-pt));
+  color: var(--fx-text-muted);
+  font-size: var(--fx-size-caption);
+  line-height: var(--fx-leading-single);
   margin-block-start: calc(14 * var(--fx-pt));
+  padding-inline: var(--fx-inset-x);
+}
+
+.deck-chip + .deck-chip:before {
+  content: "\00b7";
+  margin-inline: 0.6em;
 }
 
 /* ---- The four-layer flow ---------------------------------------------------
@@ -583,11 +860,11 @@
 .deck-flow-col {
   display: flex;
   flex-direction: column;
-  border: var(--fx-rule-hairline) solid var(--fx-rule);
+  border: var(--fx-rule-card) solid var(--fx-rule);
   border-radius: var(--fx-radius);
   background: var(--fx-surface-tint);
   gap: calc(7 * var(--fx-pt));
-  padding: calc(11 * var(--fx-pt));
+  padding: var(--fx-card-pad-y) calc(20 * var(--fx-u));
 }
 
 /* The head names the layer: the kicker in accent caps, ruled off from the
@@ -601,9 +878,9 @@
 .deck-flow-layer {
   border-block-end: var(--fx-rule-hairline) solid var(--fx-rule);
   color: var(--fx-text-accent);
-  font-size: var(--fx-size-step);
+  font-size: var(--fx-size-kicker);
   font-weight: var(--fx-weight-bold);
-  letter-spacing: var(--fx-track-caps);
+  letter-spacing: var(--fx-track-kicker);
   line-height: 1.2;
   padding-block-end: calc(6 * var(--fx-pt));
   text-transform: uppercase;
@@ -646,102 +923,10 @@
   color: var(--fx-tint-band);
 }
 
-/* ---- The table (tpl-21) ---------------------------------------------------
- * Navy header band, zebra body rows, hairline rules, no vertical walls, rounded
- * outer corners. A second table under a label of its own is the shape for facts
- * the first table's columns do not fit - a column that means nothing in half
- * the rows is worse than two tables.
- */
-
-.deck-runs {
-  display: flex;
-  flex: none;
-  flex-direction: column;
-  min-block-size: 0;
-}
-
-.deck-runs-table {
-  overflow: hidden;
-  border: var(--fx-rule-hairline) solid var(--fx-rule);
-  border-radius: var(--fx-radius);
-}
-
-.deck-runs-row {
-  display: grid;
-  align-items: center;
-  column-gap: calc(16 * var(--fx-pt));
-  grid-template-columns: 2fr 1fr 2fr;
-  padding-block: calc(7 * var(--fx-pt));
-  padding-inline: calc(14 * var(--fx-pt));
-}
-
-.deck-runs-row_head {
-  background: var(--fx-navy);
-  color: var(--fx-text-inverted);
-  font-size: var(--fx-size-step);
-  font-weight: var(--fx-weight-bold);
-  letter-spacing: var(--fx-track-caps);
-  text-transform: uppercase;
-}
-
-.deck-runs-row_band {
-  background: var(--fx-surface-tint);
-}
-
-.deck-runs-agent {
-  color: var(--fx-text-title);
-  font-size: var(--fx-size-text);
-  font-weight: var(--fx-weight-bold);
-  line-height: 1.2;
-}
-
-/* The model is what the agent was run WITH, so it hangs under the agent's name
-   rather than taking a column that would rank it as a separate fact. */
-
-.deck-runs-model {
-  display: block;
-  color: var(--fx-text-muted);
-  font-size: var(--fx-size-step);
-  font-weight: var(--fx-weight-regular);
-  letter-spacing: normal;
-  text-transform: none;
-}
-
-.deck-runs-time {
-  color: var(--fx-text-title);
-  font-size: var(--fx-size-body);
-  font-variant-numeric: tabular-nums;
-  font-weight: var(--fx-weight-bold);
-}
-
-.deck-runs-tokens {
-  color: var(--fx-text);
-  font-size: var(--fx-size-step);
-  line-height: 1.3;
-}
-
-.deck-runs-ctl-label {
-  color: var(--fx-text-muted);
-  font-size: var(--fx-size-step);
-  font-weight: var(--fx-weight-bold);
-  letter-spacing: var(--fx-track-caps);
-  margin-block: calc(12 * var(--fx-pt)) calc(6 * var(--fx-pt));
-  text-transform: uppercase;
-}
-
 /* ---- Diagram slides -------------------------------------------------------
- * Two slides are a single drawing, and the drawing is height-bound: its ratio
- * is fixed, so every pixel of height the header does not use is width the
- * labels gain. The title stays at the donors' 8.7% - it is the one thing that
- * must not move between slides - and only the box UNDER it gives way, which is
- * invisible to the eye and worth about a tenth of the label size.
+ * A drawing takes the Image Full frame (x=48, y=144, 1184 x 505.9) with no card
+ * of its own: the picture replaces the placeholder, as it does in PowerPoint.
  */
-
-.fx-diagram-slide .deck-slide-header {
-  block-size: auto;
-  min-block-size: 0;
-  padding-block-end: calc(8 * var(--fx-pt));
-}
 
 .deck-figure {
   display: flex;
@@ -757,48 +942,6 @@
   inline-size: 100%;
   object-fit: contain;
 }
-
-/* ---- The dark pages -------------------------------------------------------
- * Cover, quote and closing sit on the same ground and share one structure: an
- * unpadded root, a padded body wrapper, and a footer beside that wrapper rather
- * than inside it.
- *
- * The footer's box spans the whole slide and its runs of text keep their margin
- * through the footer's OWN padding-inline. That separation is what keeps the
- * rule edge to edge: with the padding on the root instead, a rule drawn here
- * stops 3.8% short at each end while nothing else looks wrong.
- *
- * On this ground the hairline goes TRANSPARENT rather than away, so the box
- * metrics stay identical to a light page and the wordmark holds still as the
- * deck advances. A dark page carries no section nav.
- */
-
-.deck-cover .deck-slide-footer {
-  border-block-start-color: transparent;
-  color: var(--fx-text-muted-dark);
-  inline-size: 100%;
-  margin-block-start: auto;
-}
-
-.deck-dark-body {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: center;
-  min-block-size: 0;
-  padding-inline: var(--fx-margin-inline);
-}
-
-/* The closing title is the donors' 46pt, one step under the cover's 64pt: the
-   two dark pages are a pair, not a repeat. */
-
-.deck-dark h1 {
-  font-size: var(--fx-size-closing);
-}
-
-/* No mark beside the wordmark on the dark bookends: the web's four-square
-   BrandMark is not part of the deck system, so the only brand mark a slide
-   carries is the footer wordmark. */
 
 /* ---- 6. The play view's own chrome ----------------------------------------
  * Slidev's hover toolbar in the bottom-left corner STAYS: the presenter drives

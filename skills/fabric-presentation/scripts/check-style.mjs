@@ -13,21 +13,22 @@
  *   NOTATION   a colour written as rgb()/hsl()/oklch()/color-mix() - notations
  *              this checker cannot read as a palette member
  *   GRADIENT   a gradient outside the dark ground and the ribbon illustration
- *   RADIUS     a square corner, or a radius not built from the token ladder
+ *   RADIUS     a square card, a rounded table, or a radius off the token ladder
  *   SHADOW     a box-shadow, text-shadow or drop-shadow filter
  *   FONT       a serif or slab family, Arial as the primary face, or the mono
  *              face outside terminal/code content
  *   TYPEFLOOR  a literal font-size below the 11px screen floor
  *   TINTFILL   a tint fill stacked on a tint ground with no white flip
  *   INK        black ink on text - Fabric's ink is navy-family
+ *   STATUS     a status colour (green, amber, red) outside a tag, dot or
+ *              status rule - they are small signals, never fills or headings
  *
  * The rule set follows references/fabric-style.md, whose §1 is the
- * whole of it in one line: Fabric is a MONOCHROME BLUE system. There is no red,
- * no yellow, no green and no warm hue in either donor file, so status on a
- * slide is carried by words, weight and position - never by hue. Nothing here
- * demands a saturated fill anywhere in a deck, and nothing polices text on a
- * warm ground: in this system there is no such ground to set text on, and a
- * deck with no saturated fill anywhere is exactly right.
+ * whole of it in one line: Fabric is a BLUE-AND-NAVY system (template v4).
+ * Teal and lilac are selective secondary accents; green, amber and red exist
+ * only as small status signals beside the status word. Nothing here demands a
+ * saturated fill anywhere in a deck, and nothing polices text on a warm
+ * ground: in this system there is no such ground to set text on.
  *
  * The closed palette itself is not written here: it is derived at startup from
  * assets/fabric-tokens.css, the single source of truth for colour values.
@@ -37,23 +38,32 @@
  *  - PALETTE: the closed palette is the set of hexes fabric-tokens.css defines
  *    (spec §1 records where each was observed). A hex outside it is a finding; a WARM one - red, orange,
  *    yellow or green family - is a finding whose message names the reason,
- *    because a warm hue is the one thing a writer reaches for out of habit and
- *    the one thing this system never has.
- *  - RADIUS: every container in both donors is a roundRect (law §3.3), so the
- *    finding runs the opposite way from most checkers: `border-radius: 0`
- *    is the violation. A radius must come from the token ladder (--fx-radius,
- *    --fx-radius-lg, --fx-radius-pill), or be 50% for a circle or 999px for a
- *    pill. The one other token accepted is --fx-rule-accent, which caps the
- *    2pt accent rule of the closing slide (exm-15) into a lozenge.
+ *    because a writer reaches for a warm hue out of habit and the system's
+ *    only warm hues are its three status colours.
+ *  - STATUS: green, amber and red are legal only as small signals (law §1.4,
+ *    guide slide 11). A status token or hex on a line whose rule selector does
+ *    not name a tag, dot, chip, pill, badge, light or status - and that is not
+ *    the line defining the token - is a finding: a status colour has left its
+ *    tag and become a fill, a heading or decoration.
+ *  - RADIUS: every card in template v4 is a roundRect and every table is a
+ *    square graphic frame (law §3.3). So on a rule whose selector names a
+ *    table, a row or a cell, a radius other than 0 is the violation; anywhere
+ *    else `border-radius: 0` is. A radius must come from the token ladder
+ *    (--fx-radius, --fx-radius-lg, --fx-radius-pill), or be 50% for a circle or
+ *    999px for a pill. The one other token accepted is --fx-rule-accent, which
+ *    caps the 2pt accent rule of the closing slide (exm-15) into a lozenge.
  *  - GRADIENT: legal in exactly two places (law §1.1, §3.4) - the dark ground
  *    and the ribbon illustration. So a gradient clears the check when it comes
- *    through var(--fx-grad-ground) / var(--fx-grad-glow), when the line DEFINES
- *    one of those tokens, or when the line carries the marker comment
+ *    through var(--fx-grad-ground), when the line DEFINES a --fx-grad token,
+ *    or when the line carries the marker comment
  *    fx-illustration. Any other gradient is a finding.
- *  - FONT: one grotesque family (law §2). Geist Mono is legal only where the
- *    slide shows literal code, so a mono family clears the check on a line
- *    carrying the marker comment fx-terminal or fx-code, or inside a rule whose
- *    selector names terminal or code content.
+ *  - FONT: one grotesque family, Aptos (law §2): a font-family whose first
+ *    face is another named family (Geist, Inter, Arial...) is a finding. The
+ *    one exception is a bullet glyph drawn in a ::before / ::marker, which
+ *    PowerPoint itself sets in Arial. A mono family is legal only where the
+ *    slide shows literal code, so it clears the check on a line carrying the
+ *    marker comment fx-terminal or fx-code, or inside a rule whose selector
+ *    names terminal or code content.
  *  - TINTFILL: grounds and fills alternate - on a #F2F6FC ground the cards flip
  *    white with the same hairline (law §1.3, exm-11). Whether a given fill sits
  *    on a tint ground is not perfectly greppable, so the check takes a
@@ -67,8 +77,8 @@
  *    colour ships while the run stays green. Two forms are legal and are not
  *    reported: a pure white or black alpha veil, which is how the system draws
  *    a hairline on a dark ground (law §3.3), and a scheme colour written in
- *    decimal channels, which is what the glow token does.
- *  - INK: Fabric's ink is #243143 / #0E1A2C, never black (law §1.4).
+ *    decimal channels.
+ *  - INK: Fabric's ink is #243143 / #0E1A2C, never black (law §1.5).
  *
  * TYPEFLOOR is unchanged: the donors' floor is 10pt = 13.3px, and screen type
  * never goes below a whole 11px, so a literal px size under that is a finding.
@@ -141,10 +151,13 @@ const MARKER_MONO = /fx-terminal|fx-code/;
 const MARKER_FLIP = /_on-tint|fx-card_on-tint/;
 
 /* A gradient is legal through these, and through a line that defines them. */
-const GRADIENT_LEGAL = /var\(\s*--fx-grad-(?:ground|glow)\s*\)|--fx-grad-[\w-]*\s*:/;
+const GRADIENT_LEGAL = /var\(\s*--fx-grad-ground\s*\)|--fx-grad-[\w-]*\s*:/;
 
 /* A radius must come from the ladder, or be a circle or a pill. */
 const RADIUS_TOKEN = /--fx-radius|--fx-rule-accent/;
+
+/* Template v4 draws tables as square graphic frames. */
+const TABLE_SELECTOR = /table|thead|tbody|\btr\b|\btd\b|\bth\b|cell|-row\b/i;
 
 /* The tint values, by hex and by every token that carries one. */
 const TINTS = ['f2f6fc', 'e6effa', '--fx-tint', '--fx-surface-tint', '--fx-tint-band'];
@@ -152,6 +165,12 @@ const TINTS = ['f2f6fc', 'e6effa', '--fx-tint', '--fx-surface-tint', '--fx-tint-
 /* Where a tint fill is a GROUND rather than a card, read off the selector. */
 const GROUND_SELECTOR = /slide|ground|page|cover|section|body|:root|html/i;
 const CARD_SELECTOR = /card|tile|panel|band|cell|chip|step|row|table/i;
+
+/* The status colours, by token and by hex, and the selectors that may carry
+   them: a compact signal, never a ground or a heading. */
+const STATUS_USE = /var\(\s*--fx-(?:green|amber|red)(?:-[\w]+)?\s*\)|#(?:15803d|f4b544|c92e47|995600|eaf6ee|fff3d6|fdecf0)\b/i;
+const STATUS_DEFINE = /--fx-(?:green|amber|red)(?:-[\w]+)?\s*:/;
+const STATUS_SELECTOR = /tag|dot|chip|pill|badge|light|status|signal/i;
 
 /* Colour notations this checker cannot read as a palette member. */
 const RE_NOTATION = /\b(rgba?|hsla?|oklch|color-mix)\s*\(/gi;
@@ -350,7 +369,7 @@ for (const file of files) {
           file,
           lineNo,
           'PALETTE',
-          `#${hit[2]} - Fabric is monochrome blue: no red, yellow or green anywhere. Status is words, weight and position`,
+          `#${hit[2]} - off-palette warm hue: Fabric's only warm colours are the three status tokens (--fx-green/-amber/-red), for tags and dots`,
         );
         continue;
       }
@@ -360,6 +379,19 @@ for (const file of files) {
       } else {
         add(file, lineNo, 'PALETTE', `#${hit[2]} (off-palette)`);
       }
+    }
+
+    // (b1) status colours - small signals only, never a fill or a heading
+    /* A hex printed as a cell's own text (a swatch table naming its colours) is
+       content, not styling. */
+    const styled = line.replace(/>\s*#[0-9a-fA-F]{6}\s*</g, '><');
+    if (STATUS_USE.test(styled) && !STATUS_DEFINE.test(line) && !/^\s*(?:\/\*|\*|\/\/|<!--)/.test(line) && !STATUS_SELECTOR.test(selector)) {
+      add(
+        file,
+        lineNo,
+        'STATUS',
+        `${selector || '(no rule)'} - green, amber and red are for status tags, dots and lights only, beside the status word`,
+      );
     }
 
     // (b2) colours the checker cannot read: rgb(), hsl(), oklch(), color-mix()
@@ -391,7 +423,7 @@ for (const file of files) {
         file,
         lineNo,
         'GRADIENT',
-        `${hit[1]}-gradient( - only var(--fx-grad-ground)/(--fx-grad-glow) or a ${MARKER_ILLUSTRATION} rule`,
+        `${hit[1]}-gradient( - only var(--fx-grad-ground) or a ${MARKER_ILLUSTRATION} rule`,
       );
     }
 
@@ -399,6 +431,11 @@ for (const file of files) {
     RE_RADIUS.lastIndex = 0;
     while ((hit = RE_RADIUS.exec(line)) !== null) {
       const raw = hit[1].trim().replace(/\s*\/\*.*$/, '').trim();
+      const square = /^0(px|rem|em|pt|%)?$/.test(raw);
+      if (TABLE_SELECTOR.test(selector)) {
+        if (!square) add(file, lineNo, 'RADIUS', `${raw} on ${selector} - template v4 tables are square`);
+        continue;
+      }
       if (RADIUS_TOKEN.test(raw)) continue;
       if (/^(50%|999px|var\(--fx-radius-pill\))$/.test(raw)) continue;
       if (/^0(px|rem|em|pt|%)?$/.test(raw)) {
@@ -430,8 +467,9 @@ for (const file of files) {
         );
       }
       const first = value.split(',')[0].trim().replace(/^['"]|['"]$/g, '');
-      if (/^arial$/i.test(first)) {
-        add(file, lineNo, 'FONT', 'Arial as the primary text face - the family is Geist, Arial is the fallback');
+      const bulletGlyph = /::?(before|marker)\b/.test(selector);
+      if (!bulletGlyph && !first.startsWith('var(') && !/^(aptos|aptos mono|inherit|initial|unset)$/i.test(first) && !MONO_FAMILY.test(first)) {
+        add(file, lineNo, 'FONT', `${first} as the primary face - the template v4 family is Aptos (var(--fx-font))`);
       }
     }
 

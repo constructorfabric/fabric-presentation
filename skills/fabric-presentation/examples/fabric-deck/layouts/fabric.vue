@@ -1,11 +1,10 @@
-<!-- The root carries NO .slidev-layout class: that class is the theme's own,
-     and its padding insets the slide box, which pulls the footer's rule off the
-     left and right edges. The footer is full bleed. -->
+<!-- The light slide of template v4. The root is the whole canvas, unpadded and
+     positioned; the title frame (y=52.8), the content box (x=48..1232 from
+     y=163.2) and the footer frame (y=664.3) are absolute, at the template's own
+     coordinates - see style.css §3. `ground: tint` in a slide's frontmatter puts
+     it on the #F2F6FC ground the Agenda layout uses. -->
 <template>
-  <div class="deck-slide">
-    <!-- The header holds the title alone, with the optional blue takeaway line
-         under it. The caps eyebrow does not go over a content title: it
-         repeats the claim the title already states. -->
+  <div class="deck-slide" :class="{ 'deck-slide_tint': ground === 'tint' }">
     <header class="deck-slide-header">
       <slot name="header" />
     </header>
@@ -14,31 +13,33 @@
       <slot />
     </main>
 
-    <!-- The footer is mandatory on every content slide: a hairline rule, the
-         10pt bold wordmark at the left margin, the section names in the middle
-         and a two-digit page number at the right. There is no logo image
-         anywhere in the system. The nav renders nothing when sections.ts
-         declares no sections, and no dark page mounts it at all. -->
+    <!-- The footer on every page: the 10pt bold wordmark and the unpadded page
+         number, nothing else - no rule, no logo image. The section nav renders
+         nothing while sections.ts is empty, which is how the template ships. -->
     <footer class="deck-slide-footer">
       <span class="deck-footer-brand">Constructor Fabric</span>
       <SectionNav />
-      <span class="deck-page-number">{{ pageNumber }}</span>
+      <span class="deck-page-number">{{ $page }}</span>
     </footer>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { computed } from 'vue';
+  import { computed, unref } from 'vue';
   import { useSlideContext } from '@slidev/client';
   import SectionNav from '../components/SectionNav.vue';
 
-  /* `$page` is THIS slide's number. The deck's navigation state is a different
-     thing: `nav.currentPage` is where the viewer is, which in an export renders
-     the same number on every page, and `$slidev` is a template global that is
-     not on globalThis in a script block, so reading it here yields nothing at
-     all. Two digits, so the number's width does not jitter between 9 and 10 -
-     the donor decks pad theirs the same way. */
-  const { $page } = useSlideContext();
+  /* `$page` is THIS slide's number - `nav.currentPage` is where the viewer is,
+     which in an export prints the same number on every page. `$frontmatter` is
+     a plain reactive object in some Slidev versions and a ref in others; `unref`
+     reads both. */
+  const { $page, $frontmatter } = useSlideContext();
 
-  const pageNumber = computed(() => String($page.value).padStart(2, '0'));
+  const ground = computed(() => {
+    const matter: unknown = unref($frontmatter);
+
+    return matter && typeof matter === 'object' && 'ground' in matter
+      ? (matter as { ground: unknown }).ground
+      : undefined;
+  });
 </script>

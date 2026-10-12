@@ -21,11 +21,9 @@ export type DeckSection = {
   from: number;
 };
 
-export const sections: DeckSection[] = [
-  { name: 'What it buys', from: 5 },
-  { name: 'How it assembles', from: 9 },
-  { name: 'What comes next', from: 14 },
-];
+/* Empty, as template v4 ships: its footer is the wordmark and the page number
+ * only. Fill this to opt in to the nav. */
+export const sections: DeckSection[] = [];
 
 /* The section a page belongs to: the last one that has started. A page before
  * the first divider - the cover, the agenda, the opening pair - belongs to no

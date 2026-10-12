@@ -36,7 +36,7 @@ node <skill>/scripts/export-single-html.mjs . --output /tmp/fabric-deck.html
 
 `<skill>` is your installed `fabric-presentation` directory - the one holding `SKILL.md`. While this deck still sits inside the skill that is `../..`; once you have copied the deck somewhere of your own, it is wherever the skill lives.
 
-That produces **1.45 MB** for these twenty slides: the whole Vue app, the styles, 22 Geist woff2 face files (286 kB), both `public/` diagrams (48 kB) and the favicon, all base64'd into one `.html`. It is the live deck - real navigation, selectable text, working links - not pictures of slides, and it opens over `file://` with the network switched off. The script re-reads its own output and refuses to write a file that would still reach a network on open.
+That produces one `.html` of about **1.06 MB** for these twenty-two slides: the whole Vue app, the styles, both `public/` diagrams and the favicon, all base64'd into it. No web font is embedded - the deck sets Aptos and falls back to Helvetica Neue, both system faces. It is the live deck - real navigation, selectable text, working links - not pictures of slides, and it opens over `file://` with the network switched off. The script re-reads its own output and refuses to write a file that would still reach a network on open.
 
 With the dev server up there is a second route to the same file: the **HTML icon at the end of the nav control bar**, beside Slidev's own browser-exporter entry. Click it, watch it spin for the length of the build, and the `.html` downloads. The exported file itself carries no export control of any kind - the button is `custom-nav-controls.vue`, which renders in dev only, and Slidev's two are dev-only by default.
 
@@ -44,41 +44,54 @@ Three things here make it possible: `vite.config.ts` (the build settings, inert 
 
 What it cannot carry, and the whole trap list, is in the skill's `references/slidev.md`.
 
-## The slides, and what each one demonstrates
+## The slides
 
-| # | Slide | Composition | Where it comes from |
-| --- | --- | --- | --- |
-| 01 | Constructor Fabric | dark cover: eyebrow, 64pt title, tagline with one accented run, date | `cover` case; tpl-01, exm-01 |
-| 02 | Five things to settle today | agenda: numbered rows on hairlines, number in its own column | donor layout Agenda, tpl-03 |
-| 03 | Materialization over generation | contrast pair: tint card against navy panel, figures ruled off at the foot of each | `contrast-pair` case; exm-05, exm-11 |
-| 04 | From libraries to a project | four columns read as a scheme, connectors in their own grid columns, result column filled | donor layout Four Columns, tpl-11 |
-| 05 | What it buys | dark section divider | `section-divider` case; tpl-02, exm-03 |
-| 06 | What a new project starts with | big stats: three 40pt tiles over one 54pt figure ruled off below | donor layouts Big Stats tpl-13 and exm-12 |
-| 07 | The template inventory | two tables on one slide: the wide one with a navy header band and zebra rows, a compact one under its own label | `quarter-table` case; tpl-21 |
-| 08 | The console as it arrives | image half: tint frame with an INSERT IMAGE label beside a text column | donor layouts Image Half tpl-06 and Image tpl-04 |
-| 09 | How it assembles | dark section divider | `section-divider` case |
-| 10 | Seven commands | command list on the dark gradient panel, mono on the command only | `terminal-flow` case |
-| 11 | A build from a single prompt | dark panel quoting the prompt, numbered navy circles on a hairline rail under it | `terminal-flow` case + tpl-17 |
-| 12 | Runtime: shell and screens | full-width SVG diagram, header collapsed by `class: fx-diagram-slide` | drawing, on the palette's roles |
-| 13 | A narrow typed contract | full-width SVG sequence diagram | drawing, on the palette's roles |
-| 14 | What comes next | dark section divider | `section-divider` case |
-| 15 | What lands, and in what order | timeline: navy pill badges on a rail, one segment per gap | donor layout Timeline, tpl-18 |
-| 16 | Two ways to start | comparison: two option cards of equal weight, neither marked | donor layout Comparison, tpl-12 |
-| 17 | The team behind the platform | team grid: eight circles of one size with name and role | donor layout Team, tpl-16 |
-| 18 | Five consequences | five-card row, one card filled navy | `category-cards` case; tpl-08..12 |
-| 19 | (quote) | dark quote page: one sentence and its attribution, nothing else | donor layout Quote, tpl-19 |
-| 20 | Constructor Fabric | dark closing: the phrase, the caps label and the four steps | tpl-22, exm-15 |
+Every slide is template v4 (ppt.constructor.rocks, 9 October 2026) at the template's own coordinates. Where v4 has a layout for the shape, the slide IS that layout; the four compositions v4 has no layout for (04, 05, 11, 12) are built from its parts - its card, navy, step circle and type ladder.
+
+| # | Title | Shape | Source |
+|---|---|---|---|
+| 1 | Constructor Fabric | dark cover: eyebrow, 64pt title, subtitle, author line | layout Cover, v4-01 |
+| 2 | Five things to settle today | agenda rows on the tint ground | layout Agenda |
+| 3 | Every team writes the same project again | bulleted key points | layout List, v4-03 |
+| 4 | Materialization over generation | tint card against a navy panel | `contrast-pair` case, on v4 cards |
+| 5 | From libraries to a project | four columns joined by arrows, the last one navy | own composition, on v4 cards |
+| 6 | What it buys | dark section divider | layout Section Divider, v4-02 |
+| 7 | What a new project starts with | three stat cards | layout Big Stats |
+| 8 | The template inventory | square table, full grid, navy header | layout Table, v4-08 |
+| 9 | The console as it arrives | image card and a centred caption beside it | layout Image Half, v4-05 |
+| 10 | How it assembles | dark section divider | layout Section Divider |
+| 11 | Seven commands | command list on the dark gradient panel, mono on the command only | `terminal-flow` case |
+| 12 | A build from a single prompt | dark panel quoting the prompt, numbered navy circles on a rail under it | `terminal-flow` case + layout Process parts |
+| 13 | Runtime: shell and screens | full-width SVG diagram in the Image Full frame | layout Image Full |
+| 14 | A narrow typed contract | full-width SVG sequence diagram | layout Image Full |
+| 15 | What comes next | dark section divider | layout Section Divider |
+| 16 | What lands, and in what order | rail through four navy circles, name and note under each | layout Process |
+| 17 | Two of five workstreams need a decision | status table: status cells tinted, the word in status ink | v4-11 |
+| 18 | Two ways to start | two option cards of equal weight, neither marked | layout Comparison |
+| 19 | The team behind the platform | eight photo circles with name and role | layout Team |
+| 20 | Four consequences of one decision | four equal cards, kicker and body | layout Four Columns |
+| 21 | (quote) | dark quote page: one sentence and its attribution | layout Quote |
+| 22 | Thank you | dark closing: title and contact lines | layout Closing, v4-09 |
 
 The two SVG diagrams carry the runtime as it actually works - a screen's declaration, the schema check before runtime, the shell's domains and menu, and the six-message contract between shell, bridge and screen - with product-generic labels: every marker is drawn in the navy outline and band tint the rest of the drawing uses, and the sequence diagram's lifelines run navy - sky - tint so no white text sits on the accent blue.
 
+## The reference slides
+
+`v4-reference.md` rebuilds the template's own eleven example slides - cover, section, key points, the two image layouts, two and three columns, table, closing and the two colour-guide pages - with this deck's layouts and classes and the template's own words. It is how the style itself is checked: render it and lay each page over the designer's render of the same slide.
+
+```sh
+tail -f /dev/null | pnpm exec slidev v4-reference.md --port 3040
+```
+
+Measured on 12 October 2026 against the v4 release's published renders, 1280 x 720: slides 1-9 differ in 0.3-1.8% of their pixels, all of it glyph antialiasing and 1-2px of text placement; every frame, card, table line and colour lands on the template's. Slides 10 and 11 differ in 4-6%: the colour-guide title is a plain text box the designer sets a little narrower, and v4-11's title uses a long dash this repository does not write.
+
 ## What the deck demonstrates besides the compositions
 
-- **Sections.** The deck is three sections, each opened by a dark divider (05, 09, 14) - dark pages are not only bookends. `sections.ts` declares the names and the page each starts on; `components/SectionNav.vue` renders them in the footer of the **light** pages with the current one in the accent blue. A dark page never carries the nav. That footer nav is our own convention and not a donor shape.
-- **One footer geometry on every page.** Same band, same baseline, same padding, light and dark alike. A dark page turns its hairline transparent rather than dropping the footer box, and the cover omits only its page number - so the wordmark does not move as the deck advances. Flip between exported pages and watch it hold still.
-- **No eyebrow above a content title.** The header holds the title, with the optional blue takeaway line below it. Caps lines belong to the dark pages and to card heads.
-- **No filled band inside a card or a panel.** Every in-card heading is the kicker over a hairline rule; the one filled band shape left is the table header, which spans its whole table.
-- **The notes format, on the slides that owe a note.** Slides 01, 03 and 20 carry Claim / What to say / Not on the slide written out; the rest assert nothing beyond the picture they show, and an empty note is not a gap to be filled.
-- **The takeaway line under the picture.** In this deck each of those sentences is a conclusion drawn from what is above it, so it closes the slide (`deck-takeaway-line`) rather than sitting under the title. Under the title is the donors' own placement and equally legal - the slide picks one.
+- **Sections.** The deck is three sections, each opened by a dark divider (06, 10, 15) - dark pages are not only bookends. The template's footer carries no section nav, so `sections.ts` ships empty; filling it turns on `components/SectionNav.vue` between the wordmark and the number, our own convention rather than a template shape.
+- **One footer frame on every page.** The wordmark and an unpadded page number, no rule above them, at the same coordinates light and dark; the cover omits only its number.
+- **Content from the top.** Every content slide starts at the template's y=163.2; nothing floats in the middle of the zone.
+- **No eyebrow above a content title, no takeaway line under the picture.** The header holds the title alone; what a slide concludes is its title, and the rest is in the notes.
+- **The notes format, on the slides that owe a note.** Slides with a claim to defend carry Claim / What to say / Not on the slide; the rest assert nothing beyond the picture they show, and an empty note is not a gap to be filled.
 
 ## Conformance
 
@@ -86,6 +99,6 @@ The two SVG diagrams carry the runtime as it actually works - a screen's declara
 node <skill>/scripts/check-style.mjs .
 ```
 
-The deck passes clean. The checker skips `public/`, so it does not read the two diagrams; their palettes were checked by hand and carry no warm hex.
+The deck passes clean. The checker skips `public/`, so it does not read the two diagrams; their palettes were checked by hand and carry no status or other warm hex.
 
 The law this deck renders is the skill's `references/fabric-style.md`, and its `references/fabric-slidev-decks.md` carries what the Fabric Slidev deck family shares.

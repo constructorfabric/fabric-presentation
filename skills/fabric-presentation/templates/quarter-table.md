@@ -11,7 +11,7 @@ layout: fabric
 <QuarterTable />
 
 <!--
-Claim: what the plan as a whole commits to - the key-focus band already says what each period is for, so the title must say something the bands do not.
+Claim: what the plan as a whole commits to - the key-focus row already says what each period is for, so the title must say something that row does not.
 
 What to say: which cells are commitments and which are intentions, and what the empty cells mean. Horizontal extent reads as elapsed time here by construction, so say what a full column means.
 

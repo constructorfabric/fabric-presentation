@@ -6,17 +6,19 @@
  * references/fabric-style-spec.md (the OOXML derivation of the geometry and
  * the type ladder of "1 - Constructor Fabric Template.potx" and
  * "2 - Constructor-Fabric-Template-Examples.pptx"), plus the live
- * constructorfabric.org CSS for web-only values (Geist, gradient recipes,
+ * constructorfabric.org CSS for web-only values (gradient recipes,
  * the BrandMark).
  *
- * The law in one line: Fabric is a MONOCHROME BLUE system - the fourteen
- * hexes below are the whole palette, white is the light ground, a navy
- * gradient is the dark ground, #0065E3 is the accent on light and #6BA5F0
- * the accent on dark, cards are #F2F6FC with 1pt #DCE3EE borders and ROUNDED
- * corners, and there is no red, no yellow, no green - no status colour at
- * all. Status is words, weight and position. Gradients exist only as the
- * dark ground and the ribbon illustration; light slides are flat, and no
- * element casts a shadow.
+ * The law in one line (template v4, 2026-10-09): Fabric is a BLUE-AND-NAVY
+ * system. #0065E3 and #00204D lead and carry all structure; white is the light
+ * ground, a navy gradient is the dark ground, #0065E3 is the accent on light
+ * and #6BA5F0 the accent on dark, cards are #F2F6FC with 1pt #DCE3EE borders
+ * and ROUNDED corners. Teal #087582 and lilac #8545D6 are SECONDARY accents,
+ * used selectively (a data series, a category). Green #15803D, amber #F4B544
+ * and red #C92E47 are STATUS colours only: small tags, dots and traffic
+ * lights, always beside the status word - never a large fill, a heading, a
+ * band or a decorative chart. Gradients exist only as the dark ground and the
+ * ribbon illustration; light slides are flat, and no element casts a shadow.
  *
  * Drop this file next to a deck's own stylesheet and import it first, then
  * build with var(--fx-*). Set --fx-scale once if the deck's logical slide is
@@ -43,19 +45,36 @@
   --fx-muted-dark: #a9bedd; /* muted ink on dark: author, footer, page no. */
   --fx-muted: #6e7b8c; /* muted ink on light: footer, captions, roles */
 
-  /* There is NO red, yellow, green or warm hue in this system. Do not add
-     one; scripts/check-style.mjs reports any warm hex as PALETTE. */
+  /* ---- Colour: secondary accents (template v4, accent2/accent3) ----------- */
+  /* Selective support for blue and navy: a second data series, a category
+     that needs telling apart. Never a title, a ground or the slide's lead. */
+  --fx-teal: #087582; /* accent2 - supporting emphasis, selected data series */
+  --fx-teal-tint: #e7f5f6; /* teal's swatch tint (guide slide 10) */
+  --fx-lilac: #8545d6; /* accent3 - occasional emphasis, categories */
+  --fx-lilac-tint: #f3ecfb; /* lilac's swatch tint (guide slide 10) */
+  --fx-navy-tint: #edf1f7; /* navy's swatch tint (guide slide 10) */
+
+  /* ---- Colour: status only (template v4, accent4..6) ---------------------- */
+  /* Small signals only: a tag, a dot, a traffic light, always next to the
+     status word (On track / At risk / Blocked). Never a large fill, a heading,
+     a band, a card ground or a decorative chart. scripts/check-style.mjs
+     reports a status token outside a tag/dot/status rule as STATUS, and any
+     other warm hex as PALETTE. */
+  --fx-green: #15803d; /* On track - good, complete or healthy */
+  --fx-green-tint: #eaf6ee;
+  --fx-amber: #f4b544; /* At risk - the dot / light; too pale for text */
+  --fx-amber-ink: #995600; /* At risk - the tag's text on its tint */
+  --fx-amber-tint: #fff3d6;
+  --fx-red: #c92e47; /* Blocked - failed, critical or unable to continue */
+  --fx-red-tint: #fdecf0;
 
   /* ---- Colour: the gradients (the only two legal ones) -------------------- */
-  /* The dark ground: the donors ship it as a jpeg; this is its CSS recipe
-     (web + the theme's own three navy stops). Add the glow layer on covers
-     and closings only. */
-  --fx-grad-ground: linear-gradient(160deg, #0a2d63 0%, #00204d 45%, #001838 100%);
-  --fx-grad-glow: radial-gradient(
-    60% 80% at 85% 15%,
-    rgb(38 104 197 / 22%),
-    transparent 70%
-  );
+  /* The dark ground: v4 ships it as a 1600x900 jpeg (the same file as
+     assets/reference/fabric-dark-ground.jpeg) on Cover, Section Divider, Image
+     Divider, Quote and Closing. Sampled across its height it is a plain
+     VERTICAL ramp through the theme's own three navies - top #0A2D63, middle
+     #00204D, bottom #001838, constant across each row - with no corner glow. */
+  --fx-grad-ground: linear-gradient(180deg, #0a2d63 0%, #00204d 50%, #001838 100%);
 
   /* ---- Semantic aliases (use these in components) ------------------------- */
   --fx-text: var(--fx-ink);
@@ -71,28 +90,56 @@
   --fx-rule: var(--fx-line);
 
   /* ---- Type ---------------------------------------------------------------
-   * One family, weight carries hierarchy. The web family is Geist (Google
-   * Fonts: Geist + Geist Mono); the PPT donors declare the office-safe
-   * stand-ins Aptos (TPL) and Arial (EXM), so the fallbacks run through the
-   * same neutral grotesques. No serif, no slab, no italic except quotes.
+   * One family, weight carries hierarchy. Template v4 sets every run in Aptos
+   * (331 explicit runs, theme major and minor font). Where Aptos is not
+   * installed - macOS without Office, the designer's own renders on
+   * ppt.constructor.rocks - it falls back to Helvetica Neue, and that is what
+   * the published v4 pages show, measured glyph for glyph. So the stack is
+   * Aptos, then Helvetica Neue, then the neutral grotesques. No web font is
+   * loaded. No serif, no slab, no italic except quotes.
    */
   --fx-font:
-    "Geist", "Aptos", "Segoe UI Variable Display", "Segoe UI", system-ui,
-    -apple-system, "Helvetica Neue", arial, sans-serif;
+    "Aptos", "Helvetica Neue", helvetica, "Segoe UI", arial, sans-serif;
 
-  /* Monospace is NOT a second brand face. Geist Mono is legal only where the
-     slide shows literal code: a command, a path, a terminal transcript. Never
+  /* Monospace is NOT a second brand face. It is legal only where the slide
+     shows literal code: a command, a path, a terminal transcript. Never
      labels, eyebrows, headings, numerals, table figures or prose. */
   --fx-font-mono:
-    "Geist Mono", ui-monospace, sfmono-regular, menlo, consolas,
+    "Aptos Mono", ui-monospace, sfmono-regular, menlo, consolas,
     "Liberation Mono", monospace;
   --fx-weight-regular: 400;
   --fx-weight-bold: 700;
-  --fx-leading-title: 1.05; /* titles sit tight but not stacked (tpl-01) */
-  --fx-leading-body: 1.4;
-  --fx-track-title: -0.01em; /* spc="-100" on cover/section titles */
-  --fx-track-title-sm: -0.005em; /* spc="-50" on content titles */
-  --fx-track-caps: 0.15em; /* spc="150".."200" on eyebrow/kicker caps */
+
+  /* How PowerPoint sets lines, fitted to the v4 renders to within 1-2px (see
+     examples/fabric-deck/v4-reference.md): its "single" line is 1.19 x the
+     size and an lnSpc percentage P multiplies it. PowerPoint also sets the
+     first line of a frame LOWER than CSS does - by 0.12em plus 0.44 x (P - 1)
+     em in a body placeholder (--fx-lead-*), by 0.055em in a title - and gives
+     every later paragraph a 20% space-before (--fx-space-before). A layout
+     adds the lead as margin above the frame's first paragraph. */
+  --fx-leading-title: 1.19; /* every title: single spacing */
+  --fx-leading-single: 1.19;
+  --fx-leading-card: 1.547; /* lnSpc 130%: card body, kicker, timeline note */
+  --fx-leading-body: 1.666; /* lnSpc 140%: image caption, image + text body */
+  --fx-leading-wide: 1.785; /* lnSpc 150%: comparison body, closing contacts */
+  --fx-leading-list: 1.904; /* lnSpc 160%: the Key points bullets */
+  --fx-leading-agenda: 2.023; /* lnSpc 170%: the agenda rows */
+  --fx-lead-title: 0.055;
+  --fx-lead-single: 0.12;
+  --fx-lead-card: 0.25;
+  --fx-lead-wide: 0.34;
+  --fx-lead-list: 0.385;
+  --fx-lead-agenda: 0.43;
+  --fx-lead-middle: 0.68; /* a middle-anchored 140% frame: the image caption */
+  --fx-space-before: 0.238em; /* spcBef 20% of the single line */
+
+  /* Tracking is spc in the XML: hundredths of a POINT, not a percentage, so
+     it is written in pt and stays the same absolute amount at any size. */
+  --fx-track-title: calc(-1 * var(--fx-pt)); /* spc -100: cover, section, closing */
+  --fx-track-title-sm: calc(-0.5 * var(--fx-pt)); /* spc -50: content title, quote */
+  --fx-track-caps: calc(2 * var(--fx-pt)); /* spc 200: dark eyebrow caps */
+  --fx-track-kicker: calc(1 * var(--fx-pt)); /* spc 100: card kicker caps */
+  --fx-track-label: calc(1.5 * var(--fx-pt)); /* spc 150: placeholder labels */
 
   /* ---- The pt ladder ------------------------------------------------------
    * The logical slide is 1280px = 13.333in wide, so 1pt = 96/72 = 1.3333px
@@ -103,18 +150,28 @@
    */
   --fx-scale: 1;
   --fx-pt: calc(0.0833rem * var(--fx-scale)); /* 1pt at a 16px root */
-  --fx-size-cover: calc(64 * var(--fx-pt)); /* cover title */
+
+  /* One pixel of the 1280 x 720 logical slide (0.75pt). Every coordinate below
+     is read off template v4's XML in these units, so a layout can be checked
+     against the XML number for number. */
+  --fx-u: calc(0.75 * var(--fx-pt));
+
+  --fx-size-cover: calc(64 * var(--fx-pt)); /* cover title (v4-01) */
   --fx-size-stat: calc(54 * var(--fx-pt)); /* the big stat number (EXM) */
-  --fx-size-closing: calc(46 * var(--fx-pt)); /* closing title */
+  --fx-size-closing: calc(46 * var(--fx-pt)); /* closing title (v4-09) */
   --fx-size-section: calc(42 * var(--fx-pt)); /* section / image-divider title */
-  --fx-size-stat-tile: calc(40 * var(--fx-pt)); /* stat number in a tile row */
-  --fx-size-title: calc(32 * var(--fx-pt)); /* content slide title */
-  --fx-size-body-lg: calc(18 * var(--fx-pt)); /* cover subtitle, lead body */
-  --fx-size-body: calc(16 * var(--fx-pt)); /* card body, subtitle, badges */
-  --fx-size-text: calc(14 * var(--fx-pt)); /* dense card body, team names */
+  --fx-size-stat-tile: calc(40 * var(--fx-pt)); /* Big Stats number */
+  --fx-size-title: calc(32 * var(--fx-pt)); /* content title; quote text */
+  --fx-size-heading: calc(20 * var(--fx-pt)); /* a sub-heading on a content slide (v4-10/11) */
+  --fx-size-body-lg: calc(18 * var(--fx-pt)); /* cover subtitle, lead line */
+  --fx-size-agenda: calc(17 * var(--fx-pt)); /* agenda rows */
+  --fx-size-body: calc(16 * var(--fx-pt)); /* bullets, captions beside an image */
+  --fx-size-lead: calc(15 * var(--fx-pt)); /* section subtitle, 2-col card body, quote attribution, contacts */
+  --fx-size-text: calc(14 * var(--fx-pt)); /* 3-col card body, team name, step name */
   --fx-size-eyebrow: calc(13 * var(--fx-pt)); /* cover/section eyebrow caps */
-  --fx-size-kicker: calc(13 * var(--fx-pt)); /* card kicker caps */
-  --fx-size-caption: calc(12 * var(--fx-pt)); /* author line, captions */
+  --fx-size-table: calc(13 * var(--fx-pt)); /* every table cell, header included */
+  --fx-size-kicker: calc(12 * var(--fx-pt)); /* card kicker caps */
+  --fx-size-caption: calc(12 * var(--fx-pt)); /* author line, image caption */
   --fx-size-step: calc(11 * var(--fx-pt)); /* timeline step description */
 
   /* The donors' floor is 10pt = 13.3px; screen type additionally never goes
@@ -122,48 +179,63 @@
   --fx-size-footer: max(11px, calc(10 * var(--fx-pt))); /* footer, page no. */
 
   /* ---- Rules, strokes, radii ---------------------------------------------- */
-  --fx-rule-hairline: max(1px, calc(0.75 * var(--fx-pt))); /* card border, 1pt in donors */
-  --fx-rule-accent: max(2px, calc(2 * var(--fx-pt))); /* the short blue closing rule */
+  --fx-rule-hairline: max(1px, calc(0.75 * var(--fx-pt))); /* table grid: 0.75pt */
+  --fx-rule-card: max(1px, calc(1 * var(--fx-pt))); /* card and photo border: 1pt */
+  --fx-rule-rail: calc(1.5 * var(--fx-pt)); /* the process rail: 1.5pt */
+  --fx-rule-accent: max(2px, calc(2 * var(--fx-pt))); /* the short blue closing rule (EXM) */
 
-  /* Rounded corners are the Fabric geometry (roundRect adj 3000 in every
-     donor card; web: cards 16, hero 22, buttons 10, pills 999). */
-  --fx-radius: calc(9 * var(--fx-pt)); /* cards, bands, frames (~12px) */
-  --fx-radius-lg: calc(16 * var(--fx-pt)); /* hero / image frames */
+  /* Cards are roundRect with adj 3000: the corner is 3% of the card's SHORTER
+     side - 8.9px on the 297.6px card every column layout uses. A fixed 9px
+     is that corner; the circles (team photo, step) are 50%. TABLES ARE SQUARE:
+     v4 draws them as graphic frames with no corner at all. */
+  --fx-radius: calc(9 * var(--fx-u)); /* cards, image frames */
+  --fx-radius-lg: calc(9 * var(--fx-u)); /* kept for old decks: same corner */
   --fx-radius-pill: 999px;
 
-  /* ---- Canvas geometry -----------------------------------------------------
-   * The donors' zones of the 1280 x 720 logical slide. The block-direction ones
-   * are FRACTIONS rather than percentages, for two reasons that meet: a
-   * block-direction percentage in CSS resolves against WIDTH, which is the
-   * wrong axis for all of them, and calc() cannot multiply a percentage by a
-   * length - so a layout multiplies the fraction by --fx-slide-h and gets the
-   * offset in pixels. The inline margin stays a percentage: it is used on the
-   * axis it belongs to.
-   *
-   * These are the single source of the geometry. A layout reads them; it does
-   * not carry a fraction of its own.
+  /* ---- Canvas geometry (template v4, in --fx-u) -----------------------------
+   * Every box starts at x=48 and the full-width ones are 1184 wide. A text
+   * frame insets its text 9.6 left/right and 4.8 top/bottom (PowerPoint's
+   * default bodyPr), so text sits at x=57.6 while a card or a table edge sits
+   * at x=48 - the difference is visible and deliberate.
    */
-  --fx-margin-inline: 3.8%; /* 463550 EMU each side; content width 92.5% */
-  --fx-title-top: 0.087; /* the content title's top */
-  --fx-content-top: 0.227; /* content zone top, so also the header's height */
-  --fx-content-bottom: 0.89; /* nothing content-bearing below this line */
-  --fx-footer-top: 0.923; /* the footer line; the band is what sits under it */
+  --fx-box-x: calc(48 * var(--fx-u)); /* left edge of every box */
+  --fx-box-w: calc(1184 * var(--fx-u)); /* full content width */
+  --fx-inset-x: calc(9.6 * var(--fx-u)); /* text-frame inset, left and right */
+  --fx-inset-y: calc(4.8 * var(--fx-u)); /* text-frame inset, top and bottom */
+  --fx-text-x: calc(57.6 * var(--fx-u)); /* where text starts */
+  --fx-title-y: calc(52.8 * var(--fx-u)); /* content title frame top */
+  --fx-content-y: calc(163.2 * var(--fx-u)); /* cards, tables, columns start here */
+  --fx-content-end: calc(649.9 * var(--fx-u)); /* the full-image card's bottom */
+  --fx-footer-y: calc(664.3 * var(--fx-u)); /* footer frame top */
+  --fx-footer-h: calc(28.8 * var(--fx-u)); /* footer frame height, text centred */
+  --fx-gutter: calc(28.8 * var(--fx-u)); /* between cards: 654.4 - 625.6 */
 
-  /* ---- Badge / marker metrics --------------------------------------------- */
-  --fx-step-size: calc(34 * var(--fx-pt)); /* numbered process circle */
-  --fx-band-h: calc(28 * var(--fx-pt)); /* band-header strip */
-  --fx-card-pad: calc(14 * var(--fx-pt)); /* card inset */
+  /* Kept for decks written against the earlier zone fractions. */
+  --fx-margin-inline: 3.75%; /* 48 / 1280 */
+  --fx-title-top: 0.0733; /* 52.8 / 720 */
+  --fx-content-top: 0.2267; /* 163.2 / 720 */
+  --fx-content-bottom: 0.9026; /* 649.9 / 720 */
+  --fx-footer-top: 0.9226; /* 664.3 / 720 */
+
+  /* ---- Card and marker metrics -------------------------------------------- */
+  --fx-card-pad-x: calc(36.5 * var(--fx-u)); /* card text inset, left/right */
+  --fx-card-pad-y: calc(28.8 * var(--fx-u)); /* card text inset, top/bottom */
+  --fx-card-pad: var(--fx-card-pad-y) var(--fx-card-pad-x);
+  --fx-card-h: calc(297.6 * var(--fx-u)); /* every column layout's card */
+  --fx-step-size: calc(52.8 * var(--fx-u)); /* numbered process circle */
+  --fx-photo-size: calc(96 * var(--fx-u)); /* team photo circle */
+  --fx-band-h: calc(28 * var(--fx-pt)); /* band-header strip (EXM) */
 }
 
 /* ---- Utilities --------------------------------------------------------------
- * Pre-coloured. A deck that uses them gets the donors' look with no further
- * colour decisions. Every container is rounded; nothing carries a shadow.
+ * Pre-coloured. A deck that uses them gets the template's look with no further
+ * colour decisions. Cards are rounded, tables square; nothing casts a shadow.
  */
 
 /* ---- Grounds -----------------------------------------------------------------
- * Light slides are flat white (or flat tint); dark slides sit on the navy
- * gradient. .fx-dark is the cover/section/quote/closing ground - add .fx-glow
- * on covers and closings for the corner glow the donor jpegs carry.
+ * Light slides are flat white; the Agenda layout is flat tint (#F2F6FC). Dark
+ * slides - cover, section, image divider, quote, closing - sit on the vertical
+ * navy ramp.
  */
 
 .fx-dark {
@@ -172,18 +244,13 @@
   font-family: var(--fx-font);
 }
 
-.fx-dark.fx-glow {
-  background: var(--fx-grad-glow), var(--fx-grad-ground);
-}
-
 .fx-ground-tint {
   background: var(--fx-surface-tint);
 }
 
 /* ---- Eyebrow / kicker ---------------------------------------------------------
- * The caps line. On dark grounds (cover, section) it is sky blue; on a card
- * or a light slide it is the accent blue. Bold, spread, uppercase - both
- * donors set it exactly so.
+ * The caps line. On dark grounds (cover, section) it is sky blue, 13pt, spc
+ * 200; inside a card it is the accent blue, 12pt, spc 100.
  */
 
 .fx-eyebrow {
@@ -192,6 +259,7 @@
   font-size: var(--fx-size-eyebrow);
   font-weight: var(--fx-weight-bold);
   letter-spacing: var(--fx-track-caps);
+  line-height: var(--fx-leading-single);
   text-transform: uppercase;
 }
 
@@ -200,7 +268,8 @@
   font-family: var(--fx-font);
   font-size: var(--fx-size-kicker);
   font-weight: var(--fx-weight-bold);
-  letter-spacing: var(--fx-track-caps);
+  letter-spacing: var(--fx-track-kicker);
+  line-height: var(--fx-leading-card);
   text-transform: uppercase;
 }
 
@@ -215,8 +284,8 @@
   line-height: var(--fx-leading-title);
 }
 
-/* The blue takeaway line under a content title - EXM sets one on nearly
-   every light slide. State the conclusion, not the topic. */
+/* The blue takeaway line under a content title (EXM). Not in template v4:
+   keep it off a deck that has to read as the template's own. */
 
 .fx-subtitle {
   color: var(--fx-text-subtitle);
@@ -226,22 +295,46 @@
 }
 
 /* ---- Cards -----------------------------------------------------------------
- * ROUNDED corners, a 1pt hairline, tint fill on a white ground - and the
- * fills flip (white card, same border) when the slide ground is the tint
- * (exm-11). The kicker inside is the accent blue.
+ * roundRect, 1pt #DCE3EE border, #F2F6FC fill, text inset 36.5 / 28.8. Inside:
+ * the blue caps kicker with 8pt after it, then the body at lnSpc 130%. On a
+ * tint ground the fill flips white with the same border.
  */
 
 .fx-card {
   display: flex;
   flex-direction: column;
-  border: var(--fx-rule-hairline) solid var(--fx-rule);
+  border: var(--fx-rule-card) solid var(--fx-rule);
   border-radius: var(--fx-radius);
   background: var(--fx-surface-tint);
   color: var(--fx-text);
   font-family: var(--fx-font);
-  font-size: var(--fx-size-body);
-  gap: calc(6 * var(--fx-pt));
+  font-size: var(--fx-size-text);
+  line-height: var(--fx-leading-card);
   padding: var(--fx-card-pad);
+}
+
+.fx-card > * {
+  margin: 0;
+}
+
+/* PowerPoint's line model (see --fx-lead-*): the first paragraph carries its
+   extra leading above it, every later one the 20% space-before, and the
+   kicker 8pt after it. In a flex column none of these margins collapse. */
+
+.fx-card > :first-child {
+  margin-block-start: calc(var(--fx-lead-card) * 1em);
+}
+
+.fx-card > * + * {
+  margin-block-start: var(--fx-space-before);
+}
+
+.fx-card > .fx-kicker + * {
+  margin-block-start: 0.3em;
+}
+
+.fx-card > .fx-kicker {
+  margin-block-end: calc(8 * var(--fx-pt));
 }
 
 .fx-card_on-tint {
@@ -250,7 +343,10 @@
 
 /* ---- Band header ---------------------------------------------------------------
  * EXM's lighter-weight alternative to the card: a rounded tint band with navy
- * bold text, body below on the bare ground (exm-05/06/07/13). */
+ * bold text, body below on the BARE GROUND (exm-05/06/07/13). Not in template
+ * v4. Never inside a card or a panel: a band narrower than the container it
+ * heads inverts the hierarchy. An in-card heading is .fx-card-head below.
+ */
 
 .fx-band {
   display: flex;
@@ -262,16 +358,13 @@
   font-size: var(--fx-size-body);
   font-weight: var(--fx-weight-bold);
   min-block-size: var(--fx-band-h);
-  padding-inline: var(--fx-card-pad);
+  padding-inline: var(--fx-card-pad-x);
 }
 
 /* ---- In-card heading -------------------------------------------------------
- * The heading of a card or a panel: the plain kicker, set off from the body
- * below by a hairline rule. Nothing is filled, so nothing inside the container
- * can out-rank the container - which is what a band inside a card does.
- *
- * The rule runs the full inner width of the card, which is what makes the head
- * read as belonging to the whole card rather than to a strip of it.
+ * The heading of a card or a panel: the kicker, set off from the body below by
+ * a hairline rule. Nothing is filled, so nothing inside the container can
+ * out-rank the container.
  */
 
 .fx-card-head {
@@ -280,15 +373,14 @@
   font-family: var(--fx-font);
   font-size: var(--fx-size-kicker);
   font-weight: var(--fx-weight-bold);
-  letter-spacing: var(--fx-track-caps);
-  line-height: 1.2;
+  letter-spacing: var(--fx-track-kicker);
+  line-height: var(--fx-leading-single);
   padding-block-end: calc(7 * var(--fx-pt));
   text-transform: uppercase;
 }
 
-/* On a navy panel the caps take the sky blue - the accent a dark ground uses -
-   and the hairline becomes a soft white-alpha line, because #DCE3EE on navy is
-   a bright bar rather than a separation. */
+/* On a navy panel the caps take the sky blue and the hairline becomes a soft
+   white-alpha line, because #DCE3EE on navy is a bright bar. */
 
 .fx-card-head_on-dark {
   border-block-end-color: rgb(255 255 255 / 18%);
@@ -296,8 +388,9 @@
 }
 
 /* ---- Structure markers -----------------------------------------------------
- * Navy, always: the numbered process circle on its hairline rail (tpl-17)
- * and the pill badge (tpl-18). White bold content on navy - never on blue.
+ * The Timeline/Process layout: a 1.5pt #DCE3EE rail through 52.8px navy
+ * circles carrying 16pt bold white numbers; under each, the step name (14pt
+ * bold navy, centred) and its note (11pt muted, centred, lnSpc 130%).
  */
 
 .fx-step {
@@ -329,18 +422,66 @@
 
 .fx-rail {
   background: var(--fx-line);
-  block-size: var(--fx-rule-hairline);
+  block-size: var(--fx-rule-rail);
 }
 
 /* ---- Tables ----------------------------------------------------------------
- * Navy header band, white bold; zebra rows in the tint; hairline row rules;
- * no vertical walls (tpl-21).
+ * Template v4's table (v4-08): SQUARE corners, a 0.75pt #DCE3EE line on every
+ * side of every cell - header included, so the navy header shows pale column
+ * lines - a navy header row in 13pt bold white sentence case, body rows in
+ * 13pt ink, white and #F2F6FC alternating from the first body row, text at the
+ * TOP of each cell with PowerPoint's default cell margins (9.6 / 4.8), header
+ * row 57.6 high and body rows 52.8. Figures align right.
  */
+
+.fx-table {
+  border-collapse: collapse;
+  color: var(--fx-text);
+  font-family: var(--fx-font);
+  font-size: var(--fx-size-table);
+  inline-size: 100%;
+  line-height: var(--fx-leading-single);
+  table-layout: fixed;
+}
+
+.fx-table th,
+.fx-table td {
+  border: var(--fx-rule-hairline) solid var(--fx-rule);
+  block-size: calc(52.8 * var(--fx-u));
+  padding: var(--fx-inset-y) var(--fx-inset-x);
+  text-align: start;
+  vertical-align: top;
+}
+
+/* A row label is a <th scope="row"> for screen readers, but v4 sets it in the
+   body style - only the header row is bold. */
+
+.fx-table tbody th {
+  font-weight: var(--fx-weight-regular);
+}
+
+.fx-table thead th {
+  background: var(--fx-navy);
+  block-size: calc(57.6 * var(--fx-u));
+  color: var(--fx-white);
+  font-weight: var(--fx-weight-bold);
+}
+
+.fx-table tbody tr:nth-child(even) {
+  background: var(--fx-surface-tint);
+}
+
+.fx-table .fx-num {
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+/* Older class names for the same header and band. */
 
 .fx-table-header {
   background: var(--fx-navy);
   color: var(--fx-white);
-  font-size: var(--fx-size-text);
+  font-size: var(--fx-size-table);
   font-weight: var(--fx-weight-bold);
   text-align: start;
 }
@@ -350,8 +491,8 @@
 }
 
 /* ---- Metric ----------------------------------------------------------------
- * The stat tile (tpl-13: 40pt navy number over a muted label) and the big
- * stat (exm-12: 54pt in the accent blue beside a navy sentence).
+ * The Big Stats layout: a 40pt bold navy number centred in a card, its label
+ * under it in the card's body style.
  */
 
 .fx-metric-value {
@@ -368,14 +509,75 @@
 }
 
 .fx-metric-label {
-  color: var(--fx-text-muted);
+  color: var(--fx-text);
   font-size: var(--fx-size-text);
+}
+
+/* ---- Status (template v4, guide slide 11) ------------------------------------
+ * The only legal home of the status colours. In a table the status cell is
+ * filled with the status tint and carries the status word in bold status ink
+ * (.fx-status-cell_*). Outside a table: the same tint and word as a compact
+ * square-cornered tag (.fx-status_*), or a small dot before the word. The word
+ * is always there; colour repeats it, never replaces it.
+ */
+
+.fx-status {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--fx-size-text);
+  font-weight: var(--fx-weight-bold);
+  gap: 0.45em;
+  line-height: var(--fx-leading-single);
+  padding-block: calc(4.8 * var(--fx-u));
+  padding-inline: calc(9.6 * var(--fx-u));
+  white-space: nowrap;
+}
+
+.fx-status_on-track,
+.fx-status-cell_on-track {
+  background: var(--fx-green-tint);
+  color: var(--fx-green);
   font-weight: var(--fx-weight-bold);
 }
 
+.fx-status_at-risk,
+.fx-status-cell_at-risk {
+  background: var(--fx-amber-tint);
+  color: var(--fx-amber-ink);
+  font-weight: var(--fx-weight-bold);
+}
+
+.fx-status_blocked,
+.fx-status-cell_blocked {
+  background: var(--fx-red-tint);
+  color: var(--fx-red);
+  font-weight: var(--fx-weight-bold);
+}
+
+.fx-status-dot {
+  display: inline-block;
+  flex: none;
+  border-radius: 50%;
+  background: currentcolor;
+  block-size: 0.6em;
+  inline-size: 0.6em;
+}
+
+.fx-status-dot_on-track {
+  background: var(--fx-green);
+}
+
+.fx-status-dot_at-risk {
+  background: var(--fx-amber);
+}
+
+.fx-status-dot_blocked {
+  background: var(--fx-red);
+}
+
 /* ---- The accent rule ---------------------------------------------------------
- * The short #0065E3 rule the closing slide draws above the contact line
- * (exm-15). Also legal under a title as EXM's hairline: use .fx-rail there. */
+ * The short #0065E3 rule EXM draws above the closing's contact line. Not in
+ * template v4. */
 
 .fx-rule-accent {
   border: none;
@@ -386,21 +588,15 @@
 }
 
 /* ---- Slide zones -------------------------------------------------------------
- * The donors' geometry as boxes a deck can consume directly. Put .fx-slide on
- * the layout root; the header holds the title and the blue subtitle, the
- * content box spans 22.7% to 89%, and the footer line owns the bottom. The
- * block-direction values are computed from --fx-slide-h because a percentage
- * padding in CSS resolves against WIDTH, never height.
- *
- * Set --fx-slide-h to the deck's own logical canvas height (Slidev: 552px).
+ * Template v4's geometry as boxes a deck can consume directly. Put .fx-slide on
+ * the layout root: the title frame sits at y=52.8, the content box at
+ * x=48..1232 from y=163.2, the footer frame at y=664.3. Everything is placed
+ * absolutely, the way PowerPoint places it, so nothing drifts with content.
  */
 
 .fx-slide {
-  --fx-slide-h: 552px;
-
   position: relative;
-  display: flex;
-  flex-direction: column;
+  overflow: hidden;
   background: var(--fx-surface);
   block-size: 100%;
   color: var(--fx-text);
@@ -408,46 +604,47 @@
 }
 
 .fx-slide-header {
-  flex: none;
-  block-size: calc(var(--fx-content-top) * var(--fx-slide-h));
-  padding-block: calc(var(--fx-title-top) * var(--fx-slide-h)) 0;
-  padding-inline: var(--fx-margin-inline);
+  position: absolute;
+  inline-size: calc(960 * var(--fx-u)); /* v4's title frame: 960 wide */
+  inset-block-start: var(--fx-title-y);
+  inset-inline-start: var(--fx-box-x);
+  padding: var(--fx-inset-y) var(--fx-inset-x);
 }
 
 .fx-slide-content {
+  position: absolute;
   display: flex;
-  overflow: hidden;
-  flex: 1;
   flex-direction: column;
-  justify-content: center;
-  padding-block: 0
-    calc((var(--fx-footer-top) - var(--fx-content-bottom)) * var(--fx-slide-h));
-  padding-inline: var(--fx-margin-inline);
+  block-size: calc(var(--fx-content-end) - var(--fx-content-y));
+  inset-block-start: var(--fx-content-y);
+  inset-inline: var(--fx-box-x);
 }
 
-/* Column grids: the donors run one to four equal columns on a shared gutter. */
-.fx-cols-2 {
+/* Column grids: two, three or four equal cards on a 28.8px gutter. */
+.fx-cols-2,
+.fx-cols-3,
+.fx-cols-4 {
   display: grid;
-  gap: calc(24 * var(--fx-pt));
+  gap: var(--fx-gutter);
+}
+
+.fx-cols-2 {
   grid-template-columns: repeat(2, 1fr);
 }
 
 .fx-cols-3 {
-  display: grid;
-  gap: calc(20 * var(--fx-pt));
   grid-template-columns: repeat(3, 1fr);
 }
 
 .fx-cols-4 {
-  display: grid;
-  gap: calc(16 * var(--fx-pt));
   grid-template-columns: repeat(4, 1fr);
 }
 
 /* ---- Footer ------------------------------------------------------------------
- * No band and no logo image: a hairline rule, the 10pt bold wordmark
- * "Constructor Fabric" at the left margin, the page number at the right.
- * Muted grey-blue on light, muted steel-blue on dark.
+ * No rule, no band, no logo image: the 10pt bold wordmark "Constructor Fabric"
+ * at x=57.6 and the 10pt page number right-aligned to 1222.4, both centred in
+ * the frame at y=664.3..693.1. Muted #6E7B8C on light, #A9BEDD on dark. The
+ * cover carries no number; every other page does, unpadded ("7", not "07").
  */
 
 .fx-footer {
@@ -455,14 +652,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-block-start: var(--fx-rule-hairline) solid var(--fx-rule);
+  block-size: var(--fx-footer-h);
   color: var(--fx-text-muted);
   font-family: var(--fx-font);
   font-size: var(--fx-size-footer);
-  inset-block-end: 0;
-  inset-inline: 0;
-  min-block-size: calc((1 - var(--fx-footer-top)) * var(--fx-slide-h, 552px));
-  padding-inline: var(--fx-margin-inline);
+  inset-block-start: var(--fx-footer-y);
+  inset-inline: var(--fx-box-x);
+  line-height: 1;
+  padding-inline: var(--fx-inset-x);
 }
 
 .fx-footer .fx-footer-brand {
@@ -470,6 +667,5 @@
 }
 
 .fx-dark .fx-footer {
-  border-block-start-color: rgb(255 255 255 / 12%);
   color: var(--fx-text-muted-dark);
 }

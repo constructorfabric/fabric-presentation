@@ -56,9 +56,6 @@
       ],
     },
   ];
-
-  const takeaway =
-    'The shell is installed once and the screen template once per screen; libraries are versioned apart from templates.';
 </script>
 
 <template>
@@ -89,8 +86,6 @@
         </section>
       </template>
     </div>
-
-    <p class="deck-takeaway-line">{{ takeaway }}</p>
   </div>
 </template>
 

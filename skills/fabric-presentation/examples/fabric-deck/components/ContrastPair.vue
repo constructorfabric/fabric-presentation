@@ -4,7 +4,7 @@
    *
    * Both halves are the same blue family: the way the room already works sits on
    * the tint card, the way the talk is about sits on the navy panel. Depth, not
-   * hue - there is no green column and no red column in this system, and a pair
+   * hue - green and red are status tags, never a column of the slide, and a pair
    * whose meaning survives being printed in one ink reads from the back of the
    * room.
    *
@@ -117,7 +117,7 @@
     flex-direction: column;
     border-radius: var(--fx-radius);
     gap: calc(6 * var(--fx-pt));
-    padding: calc(20 * var(--fx-pt));
+    padding: var(--fx-card-pad);
   }
 
   /* The head block: the blessed in-card heading shape - kicker typography and
@@ -201,7 +201,7 @@
      over ink body. */
 
   .pair-side_light {
-    border: var(--fx-rule-hairline) solid var(--fx-rule);
+    border: var(--fx-rule-card) solid var(--fx-rule);
     background: var(--fx-surface-tint);
     color: var(--fx-text);
   }

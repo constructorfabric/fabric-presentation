@@ -7,6 +7,40 @@ Donors:
 - **TPL** - `1 - Constructor Fabric Template.potx` (22 layouts, 1 master, 5 media jpegs)
 - **EXM** - `2 - Constructor-Fabric-Template-Examples.pptx` (15 slides; its own theme)
 
+## 0. Template v4 (9 October 2026) - supersedes the sections below where they differ
+
+Source: `Constructor-Fabric-Extended-2026-v4.pptx` / `.potx` from ppt.constructor.rocks (`latest.json`: 11 slides, 23 layouts, 16:9; built from `cf-talks/branding/source/CF-template.pptx`). Read from the unzipped XML; every coordinate in 1280 x 720 px (EMU / 9525).
+
+- **Theme**: dk1 `000000`, lt1 `FFFFFF`, dk2 `00204D`, lt2 `F2F6FC`; accents reordered to `0065E3` blue, `087582` teal, `8545D6` lilac, `15803D` green, `F4B544` amber, `C92E47` red; hlink `0065E3`, folHlink `2668C5`. Major and minor font **Aptos**; 331 runs name Aptos explicitly.
+- **Master**: text styles only - `bodyStyle` lvl1 carries `spcBef 20%` and a `•` bullet in Arial, which every body placeholder inherits; no layout overrides it. `titleStyle` `spcBef 0`. No line, no logo, no rule shape on the master or any layout; the only line in the package is the Process rail.
+- **Dark ground**: `media/image1.jpeg`, 1600 x 900, byte-identical to the older donors' grounds and to `assets/reference/fabric-dark-ground.jpeg`; a vertical ramp `0A2D63` -> `00204D` -> `001838`, constant across each row, no glow. On layouts 2, 3, 16, 21, 23.
+- **Footer**: a text frame at x=48 y=664.3, 384 x 28.8, anchor ctr, "Constructor Fabric" 10pt bold (`6E7B8C` light / `A9BEDD` dark); `sldNum` at x=1174.4, 57.6 x 28.8, right-aligned. Every layout but the Cover (2) carries the number.
+- **Text frames** use PowerPoint's default insets 9.6 / 4.8 (`bodyPr` sets none).
+- **Geometry by layout** (title frames on the example slides sit at y=52.8; the layout placeholders say 62.4 on 4, 12-14, 17-22):
+
+| Layout | Frames |
+|---|---|
+| 2 Cover | eyebrow 48,163.2 w768 13pt B spc200 `6BA5F0`; title 48,201.6 w1084.8 h201.6 64pt B spc-100 white; subtitle 48,436.8 w844.8 18pt `E6EFFA`; author 48,585.6 12pt `A9BEDD` |
+| 3 Section | eyebrow 48,230.4; title 48,273.6 w1056 42pt B spc-100; summary 48,412.8 w825.6 15pt `E6EFFA` |
+| 4 Agenda | ground `F2F6FC`; list 48,163.2 w883.2 17pt `243143` lnSpc 170% |
+| 5 / 6 / 7 Image | card 48,153.6 1184 x 417.6 + caption 48,585.6 12pt muted / card 48,144 1184 x 505.9 / card 48,144 577.6 x 505.9 + text 654.4,153.6 577.6 x 486.7 16pt lnSpc 140% anchor ctr |
+| 8 List | 48,192 w912, 16pt lnSpc 160%, bullet marL 29.3 indent -29.3 |
+| 10 / 11 / 12 Columns | cards from y=163.2, 297.6 high, gutter 28.8, widths 577.6 / 375.5 / 274.4; kicker 12pt B spc100 `0065E3` lnSpc 130% spcAft 8pt; body 15 / 14 / 13pt lnSpc 130% |
+| 13 Comparison | two 577.6 x 297.6 cards, body 15pt lnSpc 150% |
+| 14 Big Stats | three 375.5 x 249.6 cards at y=249.6, 40pt B navy centred |
+| 15 Image + Text | card 48,163.2 615.7 x 297.6; text 692.5,172.8 539.5 x 278.4 16pt lnSpc 140% |
+| 16 Image Divider | eyebrow 230.4, title 273.6 42pt, caption 48,625.9 10pt `A9BEDD` |
+| 17 Team | photo circles 96 (`E6EFFA`, 1pt `DCE3EE`) at x=137.2/440.4/743.6/1046.8, y=163.2/395.5; name frames 274.4 wide 115.2 below, 14pt B navy centred |
+| 18 Process | rail 196..1084 at y=275, 1.5pt `DCE3EE`; circles 52.8 navy at x=169.6/465.6/761.6/1057.6 y=249.6, 16pt B white; name y=331.2 14pt B navy; note y=374.4 11pt `6E7B8C` lnSpc 130%, frames 267.2 wide |
+| 20 Logos | six 177.3 x 96 cards at y=345.6 |
+| 21 Quote | 105.6,182.4 w1065.6 32pt regular white spc-50; attribution 105.6,470.4 15pt B `6BA5F0` |
+| 22 Table or Chart | content 48,163.2 1184 x 465.6 |
+| 23 Closing | title 48,201.6 w960 46pt B spc-100; contacts 48,360 w768 15pt `E6EFFA` lnSpc 150% |
+
+- **Cards**: `roundRect` adj 3000 (corner = 3% of the shorter side), fill `F2F6FC`, `ln w=12700` (1pt) `DCE3EE`, insets 36.5 / 28.8.
+- **Table** (slide 8): graphic frame 48,163.2, 1184 wide, four 296 columns; header row 57.6, body rows 52.8; every cell `lnL/R/T/B` 9525 EMU (0.75pt) `DCE3EE`; header fill `00204D`, 13pt B white; body 13pt `243143`, fills `FFFFFF` / `F2F6FC` alternating; default cell margins, top anchor; figures `algn="r"`. No corner.
+- **Guide tables** (slides 10/11): 0.6pt grid, margins 14 / 12 / 14 / 10, anchor ctr, body 16pt, header 14pt; swatch cells filled with the colour and white bold text, hex cells with the colour's tint; status cells `EAF6EE` / `FFF3D6` / `FDECF0` with the word in `15803D` / `995600` / `C92E47` bold.
+
 Contents: §1 theme colour slots - §2 fonts - §3 canvas and master - §4 the 23-layout inventory with pt sizes - §5 placeholder geometry as canvas fractions - §6 media - §7 EXM deviations.
 
 ## 1. Colour scheme (`ppt/theme/theme1.xml` clrScheme)
@@ -31,7 +65,7 @@ The two themes cover one palette of twelve values: `001838 00204D 0A2D63 0065E3 
 
 - TPL `fontScheme`: major and minor both **Aptos**; 783 explicit `typeface="Aptos"` runs across layouts/master; 9 `Arial` (bullet glyph fonts).
 - EXM: major/minor **Arial**, 552 explicit Arial runs.
-- Neither donor embeds a font. Neither carries Geist - the web family (constructorfabric.org, Aug 2026: `Geist`, `Geist Mono`); the donors' Aptos/Arial are the office-safe stand-ins for the same neutral grotesque. Slidev decks load Geist (law §2).
+- Neither donor embeds a font. Neither carries Geist - the web family (constructorfabric.org, Aug 2026: `Geist`, `Geist Mono`); the donors' Aptos/Arial are the office-safe stand-ins for the same neutral grotesque. Template v4 settles it: Slidev decks set Aptos with a Helvetica Neue fallback and load no web font; the Geist web family is superseded for decks (law §2, §0 above).
 
 ## 3. Canvas and master
 
@@ -72,7 +106,7 @@ EXM adds the louder stat: 54pt number + 30pt sentence (slide 12), and 30pt conte
 
 ## 5. Key placeholder geometry (fractions of canvas)
 
-**Cover (layout 2)** - background is a `blip` (jpeg `Cover-image-1.jpeg`, the navy gradient with glow):
+**Cover (layout 2)** - background is a `blip` (jpeg `Cover-image-1.jpeg`, the navy gradient; v4 shows it is a plain vertical ramp, no glow):
 
 | Element | x, y | w, h | Run |
 |---|---|---|---|
@@ -103,7 +137,7 @@ EXM adds the louder stat: 54pt number + 30pt sentence (slide 12), and 30pt conte
 
 ## 6. Media
 
-TPL ships five jpeg grounds - `Cover/Section-Divider/Image-Divider/Quote/Closing-image-1.jpeg` - all the same navy-gradient-with-glow family. No logo file exists in either donor; the footer brand is a text run "Constructor Fabric". EXM ships the ribbon illustrations as png+svg pairs (`image-8/9/10/13/1002/1004`), drawn from `0065E3` / `6BA5F0` curves over tint circles.
+TPL ships five jpeg grounds - `Cover/Section-Divider/Image-Divider/Quote/Closing-image-1.jpeg` - all the same file: the vertical navy ramp, no glow (§0). No logo file exists in either donor; the footer brand is a text run "Constructor Fabric". EXM ships the ribbon illustrations as png+svg pairs (`image-8/9/10/13/1002/1004`), drawn from `0065E3` / `6BA5F0` curves over tint circles.
 
 ## 7. EXM deviations worth knowing
 
