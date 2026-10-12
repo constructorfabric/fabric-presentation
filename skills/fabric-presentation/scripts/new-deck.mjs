@@ -10,27 +10,32 @@
  *
  * What it writes into <target-dir>:
  *
- *   slides.md                 headmatter, a cover, one content slide, one slide
- *                             per requested case
- *   style.css                 templates/deck-style.css plus the rules the
- *                             scaffolded layouts need
+ *   slides.md                 headmatter, a v4 cover, one content slide, one
+ *                             slide per requested case
+ *   style.css                 examples/fabric-deck/style.css sections 1-4 and
+ *                             6: the canvas, the frames, the four layouts and
+ *                             every template v4 shape - read from the example
+ *                             deck at scaffold time, so the two cannot drift
  *   fabric-tokens.css         assets/fabric-tokens.css, beside style.css
  *                             because that is where style.css imports it from
- *   layouts/fabric.vue        the donors' three zones: 32pt navy title, content
- *                             box ending at 89%, the hairline footer with the
- *                             wordmark "Constructor Fabric" and a page number
- *   layouts/fabric-cover.vue  the cover: the navy gradient ground with its
- *                             corner glow, a sky-blue eyebrow and a 64pt white
- *                             title
- *   layouts/fabric-dark.vue   the other dark pages the law requires - quote and
- *                             closing: the same ground, a 46pt title, an
- *                             eyebrow from the slide's own frontmatter, and the
- *                             full footer with its page number. Copied from
- *                             examples/fabric-deck so the two cannot drift
- *   sections.ts               the deck's sections, empty by default; declare
- *                             some and the light pages' footers grow a nav
+ *   layouts/fabric.vue        the light slide of template v4: title frame at
+ *                             y=52.8, content box from y=163.2, the footer
+ *                             with the wordmark and the unpadded page number,
+ *                             no rule
+ *   layouts/fabric-cover.vue  the cover (v4-01): eyebrow, 64pt title, subtitle
+ *                             and author line from the slide's frontmatter, on
+ *                             the vertical navy ground; no page number
+ *   layouts/fabric-section.vue the section divider (v4-02), page number on
+ *   layouts/fabric-dark.vue   quote and closing on the same ground
+ *   sections.ts               the deck's sections, empty as the template ships;
+ *                             declare some and the light pages' footers grow a
+ *                             nav
  *   components/SectionNav.vue that nav, mounted by the light layout only
- *   components/*.vue          the requested template cases, unchanged
+ *     (all four layouts, sections.ts and SectionNav.vue are copied from
+ *     examples/fabric-deck, the deck that is checked frame for frame against
+ *     template v4 by its v4-reference.md)
+ *   components/*.vue          the requested template cases that carry a
+ *                             component, unchanged
  *   vite.config.ts            the single-file HTML export's build settings plus
  *                             the dev-server endpoint its nav button calls,
  *                             copied verbatim from examples/fabric-deck so the
@@ -48,11 +53,9 @@
  *  - It copies fabric-tokens.css and style.css TOGETHER. Take one and not the
  *    other and every var() resolves to nothing, which invalidates the whole
  *    declaration it sits in: no error anywhere, and a deck of empty boxes.
- *  - The default content slide carries the Fabric anatomy before a word is
- *    typed into it: a navy title, the blue takeaway line under it, a row of
- *    rounded tint cards with accent-blue kickers, and the footer wordmark. The
- *    system is monochrome blue, so what a scaffold has to land is the SHAPE -
- *    there is no saturated fill to reach for and none is wanted.
+ *  - The default content slide carries the template's anatomy before a word is
+ *    typed into it: a navy title, a row of three tint cards with accent-blue
+ *    kickers, and the footer wordmark - the Three Columns layout (v4-07).
  *
  * It refuses to write into a non-empty directory without --force.
  */
@@ -90,9 +93,11 @@ const VERSIONS = {
 };
 
 /* ---- the cases this skill ships -----------------------------------------
- * Discovered rather than listed: a case is a .md slide block in templates/ that
- * mounts a component, and the component is the .vue file it names. Adding a case
- * to templates/ makes it available here with no edit.
+ * Discovered rather than listed: a case is a .md slide block in templates/, and
+ * when it mounts a component, the component is the .vue file it names. A block
+ * that mounts none - the section divider is a layout plus frontmatter - is a
+ * case all the same. Adding a case to templates/ makes it available here with
+ * no edit.
  */
 
 const discoverCases = () => {
@@ -104,9 +109,8 @@ const discoverCases = () => {
        capitalised name, attributes or not, on one line or spread over several
        - a case that passes props writes the tag the second way. */
     const tag = /<([A-Z][A-Za-z0-9]*)(?:\s[^>]*?)?\/>/s.exec(block);
-    if (!tag) continue;
-    const component = `${tag[1]}.vue`;
-    if (!existsSync(join(templates, component))) continue;
+    const component = tag ? `${tag[1]}.vue` : null;
+    if (component && !existsSync(join(templates, component))) continue;
     found.set(entry.replace(/\.md$/, ''), { block: entry, component });
   }
   return found;
@@ -125,7 +129,7 @@ const value = (name, fallback = null) => {
 if (argv.includes('--list') || argv.length === 0) {
   process.stdout.write('\nTemplate cases available to --cases:\n\n');
   for (const [name, entry] of [...CASES].sort()) {
-    process.stdout.write(`  ${name.padEnd(18)}  ${entry.component}\n`);
+    process.stdout.write(`  ${name.padEnd(18)}  ${entry.component ?? '(layout only)'}\n`);
   }
   process.stdout.write(
     '\nusage: node scripts/new-deck.mjs <target-dir> [--name "Deck title"]' +
@@ -204,37 +208,30 @@ const adaptBlock = (source) =>
 
 /* ---- slides.md ----------------------------------------------------------- */
 
-const coverExtra = requested.includes('cover') ? '\n\n<CoverMeta />' : '';
-
 /* The headmatter block IS the first slide's frontmatter, which is why the cover
- * layout is named there and every later slide falls through to `defaults`.
+ * layout is named there and every later slide falls through to `defaults`. The
+ * cover's eyebrow, subtitle and author line are frontmatter too: the layout
+ * places them at the template's own coordinates.
  *
- * The `fonts:` block is load-bearing. `--fx-font`
- * names "Geist" first and then falls back, so a deck without this block renders
- * in Aptos or the system grotesque and looks almost right - while Slidev, given
- * no font declaration, pulls its own theme default family that nothing in the
- * deck ever uses. Declaring it here is what makes Geist arrive, and it is also
- * what the single-file export inlines. */
+ * `fonts: provider: none` is load-bearing. `--fx-font` is Aptos, then Helvetica
+ * Neue - the faces template v4 renders in - and loads no web font. Without the
+ * line Slidev pulls its own theme default family from Google, which nothing in
+ * the deck uses and which the single-file export would then inline. */
 const head = `---
 title: ${deckTitle}
-date: '${deckDate}'
 layout: fabric-cover
 transition: none
 mdc: true
 fonts:
-  sans: Geist
-  mono: Geist Mono
-  weights: '400,700'
-  provider: google
+  provider: none
+eyebrow: Presentation
+subtitle: One line saying what this deck is for.
+author: Author Name · ${deckDate}
 defaults:
   layout: fabric
 ---
 
 # ${deckTitle}
-
-<p class="deck-cover-sub">One line saying what this deck is for.</p>
-
-<p class="deck-cover-author">Author Name &middot; ${deckDate}</p>${coverExtra}
 
 ---
 
@@ -242,23 +239,21 @@ defaults:
 
 # The claim of this slide, as a sentence
 
-<p class="deck-takeaway">The conclusion the slide supports, stated first.</p>
-
 ::default::
 
-<div class="fx-cols-3">
-  <article class="fx-card">
+<div class="deck-cols deck-cols_3">
+  <div class="fx-card">
     <div class="fx-kicker">First kind</div>
-    <div>What this one is, in one line.</div>
-  </article>
-  <article class="fx-card">
+    <p class="deck-card-body">What this one is, in one line.</p>
+  </div>
+  <div class="fx-card">
     <div class="fx-kicker">Second kind</div>
-    <div>A different KIND of thing, which the kicker says and no fill has to.</div>
-  </article>
-  <article class="fx-card">
+    <p class="deck-card-body">A different KIND of thing, which the kicker says and no fill has to.</p>
+  </div>
+  <div class="fx-card">
     <div class="fx-kicker">Third kind</div>
-    <div>Replace all three, or take a case from the skill instead.</div>
-  </article>
+    <p class="deck-card-body">Replace all three, or take a case from the skill instead.</p>
+  </div>
 </div>
 
 <!--
@@ -273,7 +268,7 @@ Not on the slide (answer if asked): what was deliberately left off, and why.
 const slides = [head];
 
 for (const name of requested) {
-  if (name === 'cover') continue; // its component rides on the cover slide above
+  if (name === 'cover') continue; // the headmatter above is the cover
   const block = adaptBlock(readFileSync(join(templates, CASES.get(name).block), 'utf8'));
   /* A case block opens with its own frontmatter, and in Slidev the slide
      separator and the opening line of that frontmatter are the SAME `---`.
@@ -283,343 +278,76 @@ for (const name of requested) {
 
 write('slides.md', slides.join(''));
 
-/* ---- styles -------------------------------------------------------------- */
-
-const layoutRules = `
-/* ---- 5. What the scaffolded layouts add ------------------------------------
- * layouts/fabric.vue, layouts/fabric-cover.vue and layouts/fabric-dark.vue are
- * this deck's own, so their rules live here rather than in a theme. Section 2
- * above already draws the three zones they share - title top 8.7%, content from
- * 22.7% down to 89%, the footer band under the 92.3% line, all of it read from
- * the zone tokens. What follows is what those layouts add on top: the page
- * number and the section nav in the footer, and the dark pages.
+/* ---- styles, layouts and sections ----------------------------------------
+ * Copied from examples/fabric-deck rather than written out here: that deck is
+ * the one checked frame for frame against template v4 (its v4-reference.md), so
+ * a fix proved there reaches every scaffolded deck with no second edit.
+ *
+ * style.css takes the example's sections 1-4 (canvas, frames, layouts, template
+ * shapes) and 6 (play-view chrome). Section 5 is that deck's own compositions;
+ * a template case carries whatever it needs beyond 1-4 in its own scoped style.
  */
 
-.deck-slide-footer {
-  gap: calc(20 * var(--fx-pt));
+const example = join(skill, 'examples', 'fabric-deck');
+const exampleStyle = readFileSync(join(example, 'style.css'), 'utf8');
+const ownStart = exampleStyle.indexOf("/* ---- 5. This deck's own");
+const chromeStart = exampleStyle.indexOf('/* ---- 6. ');
+if (ownStart === -1 || chromeStart === -1) {
+  process.stderr.write(
+    'new-deck: examples/fabric-deck/style.css no longer carries its section 5 / 6\n' +
+      '          markers, so its template base cannot be cut out. That is a bug in the skill.\n',
+  );
+  process.exit(1);
 }
-
-.deck-slide-footer .deck-footer-brand {
-  flex: none;
-}
-
-.deck-slide-footer .deck-page-number {
-  flex: none;
-  font-variant-numeric: tabular-nums;
-  min-inline-size: 20px;
-  text-align: end;
-}
-
-/* The section names, between the wordmark and the number, on LIGHT pages only:
-   a filled or dark page keeps a wordmark-only footer. This is our own
-   convention, not a donor shape - no tpl or exm page carries one. It renders
-   nothing until sections.ts declares some. */
-
-.deck-footer-nav {
-  display: flex;
-  flex: 1;
-  justify-content: center;
-  gap: calc(18 * var(--fx-pt));
-  min-inline-size: 0;
-}
-
-.deck-footer-nav-item {
-  overflow: hidden;
-  color: var(--fx-text-muted);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* The section the deck is in: the accent blue, bold. One marked item, and the
-   rest stay the footer grey - two marks send the eye hunting. */
-
-.deck-footer-nav-item_current {
-  color: var(--fx-text-accent);
-  font-weight: var(--fx-weight-bold);
-}
-
-/* The cover is a DARK slide: the navy gradient with the corner glow the donors
-   ship as a jpeg, a sky-blue eyebrow, a 64pt white title, the subtitle in the
-   pale tint and the author line in the muted blue.
-
-   The ROOT carries no inline padding. The 3.8% margin belongs to the content
-   wrapper below it, because a padded root insets everything the slide contains
-   - including a footer - and the footer's hairline then stops short of both
-   slide edges. The rule spans the full slide width on every page. */
-
-.deck-cover {
-  position: relative;
-  display: flex;
-  overflow: hidden;
-  flex-direction: column;
-  background: var(--fx-grad-glow), var(--fx-grad-ground);
-  block-size: 100%;
-  color: var(--fx-text-inverted);
-  font-family: var(--fx-font);
-}
-
-/* Everything the cover says sits in this wrapper, and the wrapper is what
-   carries the margin. Add a footer to a dark layout as a SIBLING of it and the
-   footer's rule runs edge to edge while its own text keeps the same margin. */
-
-.deck-cover-body {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: center;
-  min-block-size: 0;
-  padding-inline: var(--fx-margin-inline);
-}
-
-.deck-cover-eyebrow {
-  margin: 0 0 calc(10 * var(--fx-pt));
-  color: var(--fx-text-accent-dark);
-  font-size: var(--fx-size-eyebrow);
-  font-weight: var(--fx-weight-bold);
-  letter-spacing: var(--fx-track-caps);
-  line-height: 1.2;
-  text-transform: uppercase;
-}
-
-/* The title sits tight, so the space under it is padding rather than the
-   line's own leading - without it the subtitle sits on the descenders. */
-
-.deck-cover h1 {
-  margin: 0;
-  font-size: var(--fx-size-cover);
-  font-weight: var(--fx-weight-bold);
-  letter-spacing: var(--fx-track-title);
-  line-height: var(--fx-leading-title);
-  max-inline-size: 84.8%;
-  padding-block-end: calc(14 * var(--fx-pt));
-}
-
-.deck-cover-sub {
-  margin: 0;
-  color: var(--fx-tint-band);
-  font-size: var(--fx-size-body-lg);
-  line-height: var(--fx-leading-body);
-  max-inline-size: 66%;
-}
-
-.deck-cover-author {
-  margin-block: calc(24 * var(--fx-pt)) 0;
-  color: var(--fx-text-muted-dark);
-  font-size: var(--fx-size-caption);
-  line-height: 1.2;
-}
-
-/* A dark page carries the SAME footer box as a light one and differs in two
-   legal ways only: the hairline goes transparent (the box stays, so the
-   wordmark does not move) and the ink follows the dark ground. The cover adds
-   the third: no page number - the one page in the donors that carries the
-   wordmark alone. */
-
-.deck-cover .deck-slide-footer {
-  border-block-start-color: transparent;
-  color: var(--fx-text-muted-dark);
-}
-
-/* The other dark pages - quote and closing - sit on the same ground and share
-   the cover's structure: an unpadded root, a padded body wrapper, and a footer
-   beside that wrapper rather than inside it. They differ from the cover in one
-   thing: they carry the page number. */
-
-.deck-dark-body {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: center;
-  min-block-size: 0;
-  padding-inline: var(--fx-margin-inline);
-}
-
-/* The closing title is the donors' 46pt, one step under the cover's 64pt: the
-   two dark pages are a pair, not a repeat. */
-
-.deck-dark h1 {
-  font-size: var(--fx-size-closing);
-}
-`;
+const banner = exampleStyle.indexOf('*/') + 2;
 
 write(
   'style.css',
-  readFileSync(join(templates, 'deck-style.css'), 'utf8').trimEnd() + '\n' + layoutRules,
+  `/*
+ * ${deckTitle} - deck stylesheet, scaffolded from the fabric-presentation skill.
+ *
+ * Template v4 (ppt.constructor.rocks, 9 October 2026) on Slidev's canvas: every
+ * coordinate is the template XML's own, in --fx-u (one pixel of the 1280 x 720
+ * slide), and every frame is placed absolutely, the way PowerPoint places it.
+ * Every value is a token from ./fabric-tokens.css - keep the two files together.
+ *
+ *   1. Canvas            --fx-scale for Slidev's 980px canvas
+ *   2. Frames            the absolute text frame every layout places
+ *   3. The layouts       light slide, tint slide, dark slide, footer
+ *   4. Template shapes   cover, section, agenda, list, cards, stats, image,
+ *                        team, process, quote, closing, status table
+ *   6. Play-view chrome  one piece of Slidev's own UI, suppressed
+ *
+ * Section 5 of the example deck - its own compositions - is not part of the
+ * base. Add the deck's own furniture after section 4.
+ */
+` +
+    exampleStyle.slice(banner, ownStart).replace(/^\n+/, '\n') +
+    exampleStyle.slice(chromeStart),
 );
 copy(join(assets, 'fabric-tokens.css'), 'fabric-tokens.css');
 
-/* ---- layouts ------------------------------------------------------------- */
-
-write(
+for (const name of [
   'layouts/fabric.vue',
-  `<!-- The root carries NO .slidev-layout class: that class is the theme's own,
-     and its padding insets the slide box, which pulls the navy footer band off
-     the left and right edges. The band is full bleed. -->
-<template>
-  <div class="deck-slide">
-    <header class="deck-slide-header">
-      <slot name="header" />
-    </header>
-
-    <main class="deck-slide-content">
-      <slot />
-    </main>
-
-    <!-- The footer is mandatory on every content slide: a hairline rule, the
-         10pt bold wordmark at the left margin and a two-digit page number at
-         the right. There is no logo image anywhere in the system. Between them
-         sits the section nav, which renders nothing until sections.ts declares
-         sections - and which never appears on a dark page. -->
-    <footer class="deck-slide-footer">
-      <span class="deck-footer-brand">Constructor Fabric</span>
-      <SectionNav />
-      <span class="deck-page-number">{{ pageNumber }}</span>
-    </footer>
-  </div>
-</template>
-
-<script setup lang="ts">
-  import { computed } from 'vue';
-  import { useSlideContext } from '@slidev/client';
-  import SectionNav from '../components/SectionNav.vue';
-
-  /* \`$page\` is THIS slide's number. The deck's navigation state is a different
-     thing: \`nav.currentPage\` is where the viewer is, which in an export renders
-     the same number on every page, and \`$slidev\` is a template global that is
-     not on globalThis in a script block, so reading it here yields nothing at
-     all. Two digits, so the number's width does not jitter between 9 and 10 -
-     the donor decks pad theirs the same way. */
-  const { $page } = useSlideContext();
-
-  const pageNumber = computed(() => String($page.value).padStart(2, '0'));
-</script>
-`,
-);
-
-write(
   'layouts/fabric-cover.vue',
-  `<!-- The root draws the dark ground and nothing else: the 3.8% margin lives on
-     .deck-cover-body, so the footer beside that wrapper spans the slide edge to
-     edge. -->
-<template>
-  <div class="deck-cover">
-    <div class="deck-cover-body">
-      <!-- The eyebrow the donors' own Cover layout carries, in caps above the
-           title. It belongs to the DARK pages - a content slide's title stands
-           alone. Replace the word if the deck is not a presentation. -->
-      <p class="deck-cover-eyebrow">Presentation</p>
-
-      <slot />
-    </div>
-
-    <!-- The same footer box every page carries, so the wordmark does not move
-         when the deck leaves the cover. Two differences and no others: the
-         hairline is transparent on the dark ground, and the cover is the one
-         page in the donors that carries no number. -->
-    <footer class="deck-slide-footer">
-      <span class="deck-footer-brand">Constructor Fabric</span>
-    </footer>
-  </div>
-</template>
-`,
-);
-
-/* The dark page that is NOT the cover - the quote and the closing the law's
- * §3.5 requires, and a section divider where the deck wants a layout rather
- * than the template case. Copied rather than written out here, the same way
- * vite.config.ts is: the canonical copy is the one the example deck renders,
- * so a fix proved there reaches every scaffolded deck with no second edit. */
-
-const darkLayout = join(skill, 'examples', 'fabric-deck', 'layouts', 'fabric-dark.vue');
-if (existsSync(darkLayout)) {
-  copy(darkLayout, join('layouts', 'fabric-dark.vue'));
-} else {
-  process.stderr.write(
-    'new-deck: examples/fabric-deck/layouts/fabric-dark.vue is missing - the deck is\n' +
-      '          scaffolded without its dark closing layout. That is a bug in the skill.\n',
-  );
-}
-
-/* ---- sections ------------------------------------------------------------
- * A deck built of several parts opens each part with a dark section divider,
- * and its LIGHT pages carry the part names in the footer. Both readings come
- * from one declaration, because two lists of section names drift.
- */
-
-write(
+  'layouts/fabric-section.vue',
+  'layouts/fabric-dark.vue',
   'sections.ts',
-  `/*
- * The deck's sections, in order, and the page each one starts on.
- *
- * Leave the array empty and the footer nav renders nothing - a single-section
- * deck carries a wordmark-and-number footer and no nav at all.
- *
- * \`from\` is the page number of the section's dark divider slide, which is
- * also the first page the name is shown as current on. The page number is what
- * the layout has to work with: it is the one fact about position that is the
- * same in the dev server and in an export.
- *
- * Adding a divider slide means adding its line here. Nothing checks the two
- * against each other, so the check is the render pass: advance through the deck
- * and watch the marked name change on the page the divider sits on.
- */
-
-export type DeckSection = {
-  /* Shown in the footer. Two or three words - the footer band is 10pt. */
-  name: string;
-  /* The page its divider slide is on. */
-  from: number;
-};
-
-export const sections: DeckSection[] = [];
-
-/* The section a page belongs to: the last one that has started. A page before
- * the first divider - the cover, an agenda - belongs to no section, and the
- * nav then marks nothing rather than guessing. */
-export const sectionAt = (page: number): DeckSection | undefined =>
-  sections.filter((section) => section.from <= page).at(-1);
-`,
-);
-
-write(
   'components/SectionNav.vue',
-  `<!-- The section names in the footer of a LIGHT content page, current one in the
-     accent blue. Our own convention - the donors carry no such nav -
-     and it never goes on a filled or dark page: cover, section divider, quote
-     and closing keep a wordmark-only footer, which is why the dark layouts do
-     not mount this component at all. -->
-<template>
-  <nav v-if="sections.length > 0" class="deck-footer-nav">
-    <span
-      v-for="section of sections"
-      :key="section.name"
-      class="deck-footer-nav-item"
-      :class="{ 'deck-footer-nav-item_current': section.name === current?.name }"
-    >
-      {{ section.name }}
-    </span>
-  </nav>
-</template>
-
-<script setup lang="ts">
-  import { computed } from 'vue';
-  import { useSlideContext } from '@slidev/client';
-  import { sectionAt, sections } from '../sections';
-
-  /* \`$page\` is THIS slide's number, which is what an export needs: the deck's
-     navigation state prints the same number on every exported page. */
-  const { $page } = useSlideContext();
-
-  const current = computed(() => sectionAt($page.value));
-</script>
-`,
-);
+]) {
+  if (existsSync(join(example, name))) {
+    copy(join(example, name), name);
+  } else {
+    process.stderr.write(`new-deck: examples/fabric-deck/${name} is missing. That is a bug in the skill.\n`);
+    process.exit(1);
+  }
+}
 
 /* ---- components and assets ---------------------------------------------- */
 
 for (const name of requested) {
   const { component } = CASES.get(name);
-  copy(join(templates, component), join('components', component));
+  if (component) copy(join(templates, component), join('components', component));
 }
 
 /* The donors ship no logo file, and the deck gets none: the footer wordmark is
@@ -707,8 +435,10 @@ write(
 
 A Constructor Fabric Slidev deck, scaffolded from the \`fabric-presentation\` skill
 (\`${skill}\`). The style law it must obey is that skill's
-\`references/fabric-style.md\`: a monochrome blue system, rounded
-containers, no shadows, and status carried by words rather than by hue.
+\`references/fabric-style.md\`: the designer's template v4 - blue and navy
+lead, Aptos (Helvetica Neue where Aptos is not installed), rounded cards and
+square tables, no shadows, a footer of wordmark and page number with no rule,
+and green, amber and red only as small status signals beside the word.
 
 ## Run it
 
@@ -749,7 +479,7 @@ node ${join(skill, 'scripts', 'export-single-html.mjs')} . --output ${slug}.html
 \`\`\`
 
 Either writes ONE \`.html\` - the live deck, not pictures of it - with the script,
-the styles, the webfont and every \`public/\` asset base64'd inside. It opens over
+the styles and every \`public/\` asset base64'd inside. It opens over
 \`file://\` with the network off; the script refuses to write a file that would
 still reach for a network on open. Reckon on 1.5 MB for a twenty-slide deck.
 
@@ -776,22 +506,19 @@ in, beside the example page its shape came from.
 
 ## What is here
 
-- \`slides.md\` - the deck. \`layout: fabric\` for a content slide,
-  \`layout: fabric-cover\` for the cover, \`layout: fabric-dark\` for a quote or the
-  closing. Its one content slide is deliberately sparse - grow the content into
-  the zone before presenting it.
-- \`style.css\` + \`fabric-tokens.css\` - the palette, the type ladder and the
-  donors' zones. They are a pair: drop either and every \`var()\` in the deck
-  resolves to nothing, which silently empties the slides of colour.
-- \`layouts/\` - this deck's own three layouts: \`fabric\` for a content slide,
-  \`fabric-cover\` for the cover, and \`fabric-dark\` for the other dark pages the
-  style law asks for - the quote and the closing. Their footers share one
-  geometry with every other page: a dark page turns the hairline transparent and
-  the cover drops its number, and neither drops the box, so the wordmark does
-  not move as the deck advances.
-- \`sections.ts\` - the deck's sections, empty until the deck has some. Declare
-  them and each light page's footer carries the names with the current one in
-  the accent blue; a dark page never carries the nav.
+- \`slides.md\` - the deck. \`layout: fabric\` for a content slide (add
+  \`ground: tint\` for an agenda), \`layout: fabric-cover\` for the cover,
+  \`layout: fabric-section\` for a section divider, \`layout: fabric-dark\` for a
+  quote or the closing. Its one content slide is deliberately sparse.
+- \`style.css\` + \`fabric-tokens.css\` - the palette, the type ladder and every
+  template v4 shape at the template's own coordinates. They are a pair: drop
+  either and every \`var()\` in the deck resolves to nothing, which silently
+  empties the slides of colour.
+- \`layouts/\` - the deck's four layouts. Every page's footer is the 10pt
+  wordmark and the unpadded page number, no rule; the cover alone has no number.
+- \`sections.ts\` - empty, as the template ships: its footer carries no section
+  nav. Declare sections to opt in, and each light page's footer carries the
+  names with the current one in the accent blue.
 - \`vite.config.ts\` - the single-file HTML export, and nothing else: the build
   settings for the weld (inert unless the export script asks for it) and, in
   dev, the endpoint the nav button calls.
@@ -799,8 +526,8 @@ in, beside the example page its shape came from.
   so no build carries it.
 - \`components/\` - \`SectionNav.vue\` plus the template cases copied in${requested.length > 0 ? `: ${requested.join(', ')}` : ' (none yet)'}.
   Take more with \`node ${join(skill, 'scripts', 'new-deck.mjs')} --list\`.
-- A content slide's header holds the title alone, with the optional blue
-  takeaway line under it. The caps eyebrow belongs to the dark pages.
+- A content slide's header holds the title alone. The caps eyebrow belongs to
+  the dark pages, and content starts at the top of the content box.
 - The deck's brand mark is the footer wordmark "Constructor Fabric": there is
   no logo image in the system, and the four-square BrandMark goes on no slide.
 `,

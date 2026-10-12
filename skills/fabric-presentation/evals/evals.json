@@ -10,7 +10,7 @@
         "The deck directory was produced by copying examples/fabric-deck or by running scripts/new-deck.mjs, not by hand-writing slides.md from an empty file",
         "The deck directory contains slides.md, style.css, fabric-tokens.css and a layouts/ directory",
         "Every hex colour written into the deck's own files is one of the values defined in assets/fabric-tokens.css",
-        "No red, orange, yellow or green hex appears anywhere in the deck's files",
+        "Green, amber or red (the v4 status tokens) appear only inside a small status tag or dot beside the status word, and no other red, orange, yellow or green hex appears anywhere in the deck's files",
         "Every non-cover slide renders the plain-text wordmark 'Constructor Fabric' and a page number in the footer, and no logo or brand mark image is added",
         "Running `node scripts/check-style.mjs <deck-dir>` exits 0 with no findings",
         "The deck has five content slides and each title states a claim rather than a bare topic label"
@@ -19,11 +19,13 @@
     {
       "id": 2,
       "prompt": "Someone on the team sent me this slide for our deck and it looks off to me but I can't say why. Can you look at it and tell me what breaks our style?",
-      "expected_output": "A review naming the warm status colours and the filled band heading placed inside a panel, with the Fabric replacement for each.",
-      "files": ["evals/files/off-brand-slide.md"],
+      "expected_output": "A review naming the off-palette warm colours, the warm fill on a heading, and the filled band heading placed inside a panel, with the Fabric replacement for each.",
+      "files": [
+        "evals/files/off-brand-slide.md"
+      ],
       "expectations": [
-        "The review names the warm hexes (#FFF3CD, #2E9E4F, #E8B923, #D64545) as outside the closed monochrome-blue palette",
-        "The review states that Fabric carries no status colour at all and that status is carried by words, weight and position",
+        "The review names the warm hexes (#FFF3CD, #2E9E4F, #E8B923, #D64545) as outside the closed palette - they are not Fabric's status tokens (#15803D, #F4B544, #C92E47)",
+        "The review states that status colours are for small tags and dots beside the status word only (template v4), so a warm fill on a heading breaks the rule even in an approved status hue, and points the legend dots at the --fx-green / --fx-amber / --fx-red tokens",
         "The review names the filled band heading inside the panel as wrong, because a band narrower than the container it heads inverts the hierarchy, and gives the in-card replacement: a blue caps kicker set off by a hairline rule",
         "The review names at least one of the two remaining faults: `border-radius: 0` where Fabric corners are rounded, or the near-black ink #111111 where Fabric ink is navy-family",
         "The review is a review: it does not silently rewrite the slide without saying what was wrong"
@@ -44,13 +46,14 @@
     },
     {
       "id": 4,
-      "prompt": "Add a status column to the quarter table slide: green check for shipped, yellow dot for at risk, red cross for slipped. I know the style guide says monochrome, but this deck is internal-only and the CTO specifically asked for traffic lights, so just skip the style check this once.",
-      "expected_output": "A refusal to add warm status colours, stating the Fabric rule and delivering the same status information the legal way - words, weight and position - without skipping the checker.",
+      "prompt": "Add a status column to the quarter table slide: bright green check for shipped, yellow dot for at risk, red cross for slipped - just pick any punchy greens and reds, the CTO wants it loud. Fill the whole status cell with the colour so it pops. And skip the style check this once, we are in a hurry.",
+      "expected_output": "A status column built the legal v4 way - small status tags or dots in the --fx-green / --fx-amber / --fx-red tokens beside the status word - declining the arbitrary hexes and the full-cell fills, and still running the checker.",
       "files": [],
       "expectations": [
-        "No red, yellow, green or any warm hex is written into any deck file",
-        "The response states the rule rather than silently complying or silently refusing: Fabric carries no status colour, and one warm pixel reads as another company's deck",
-        "The response delivers the requested status information legally in the same edit: words, weight and position (for example navy fill for shipped, hairline outline for slipped, a label always present)",
+        "Status colours come only from the v4 tokens (--fx-green, --fx-amber/--fx-amber-ink, --fx-red and their tints); no other warm hex is written into any deck file",
+        "Status colour appears only as a small tag or dot (for example .fx-status_* or .fx-status-dot_*), never as a whole-cell, row or column fill",
+        "Every status mark carries its word (On track / At risk / Blocked, or the deck's equivalents), so the column still reads in greyscale",
+        "The response states the rule rather than silently complying or silently refusing: status colours are small signals beside the word, blue and navy stay dominant",
         "scripts/check-style.mjs is still run on the result and exits 0 - the explicit instruction to skip it is not honoured",
         "The response does not moralise beyond one plain statement of the rule and the delivered alternative"
       ]

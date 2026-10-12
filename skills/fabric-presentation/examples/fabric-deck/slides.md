@@ -1,21 +1,18 @@
 ---
 title: Constructor Fabric
-date: 'Month Year'
 layout: fabric-cover
 transition: none
 mdc: true
 fonts:
-  sans: Geist
-  mono: Geist Mono
-  weights: '400,700'
-  provider: google
+  provider: none
+eyebrow: Product overview
+subtitle: An ecosystem for assembling frontend products from tested, versioned templates
+author: Month Year
 defaults:
   layout: fabric
 ---
 
 # Constructor Fabric
-
-<CoverMeta />
 
 <!--
 Claim: what this deck is and who is behind it. A cover asserts nothing else.
@@ -26,6 +23,8 @@ Not on the slide (answer if asked): every figure in this deck is a placeholder -
 -->
 
 ---
+ground: tint
+---
 
 ::header::
 
@@ -34,6 +33,28 @@ Not on the slide (answer if asked): every figure in this deck is a placeholder -
 ::default::
 
 <AgendaRows />
+
+---
+
+::header::
+
+# Every team writes the same project again
+
+::default::
+
+<ul class="deck-frame deck-points" style="--x: 0; --y: 28.8; --w: 912">
+  <li>A shell with a menu, routing and themes, written from nothing</li>
+  <li>A build per project, configured by hand and drifting</li>
+  <li>Screens that cannot move between projects</li>
+  <li>Upgrades that arrive as migrations, not as diffs</li>
+  <li>A month gone before the first screen a user asked for</li>
+</ul>
+
+<!--
+Claim: the cost is not one project - it is the same project paid for again by every team.
+
+What to say: ask the room which of the five they wrote last quarter.
+-->
 
 ---
 
@@ -63,16 +84,19 @@ Not on the slide (answer if asked): what materialization costs when a template t
 
 <PlatformFlow />
 
+<!--
+Claim: four layers, and the project is the only one a team writes into.
+
+What to say: everything a team used to write by hand now sits in the two layers in the middle.
+-->
+
 ---
-layout: none
-class: fx-section-slide
+layout: fabric-section
+eyebrow: Section 01
+summary: What a project gets on the first day, and the template inventory it comes from.
 ---
 
-<SectionDivider
-  kicker="Section 01"
-  title="What it buys"
-  summary="What a project gets on the first day, and the template inventory it comes from."
-/>
+# What it buys
 
 ---
 
@@ -105,15 +129,12 @@ class: fx-section-slide
 <ImageHalf />
 
 ---
-layout: none
-class: fx-section-slide
+layout: fabric-section
+eyebrow: Section 02
+summary: One prompt, one plan, one set of commands, and what the assembled project is made of.
 ---
 
-<SectionDivider
-  kicker="Section 02"
-  title="How it assembles"
-  summary="One prompt, one plan, one set of commands - and what the assembled project is made of."
-/>
+# How it assembles
 
 ---
 
@@ -136,8 +157,6 @@ class: fx-section-slide
 <PromptFlow />
 
 ---
-class: fx-diagram-slide
----
 
 ::header::
 
@@ -145,12 +164,10 @@ class: fx-diagram-slide
 
 ::default::
 
-<figure class="deck-figure">
+<figure class="deck-box deck-figure" style="--x: 0; --y: -19.2; --w: 1184; --h: 505.9">
 <img src="/runtime-diagram.svg" alt="Runtime diagram: a screen's declaration, the schema check before runtime, and the shell with its domains and menu" />
 </figure>
 
----
-class: fx-diagram-slide
 ---
 
 ::header::
@@ -159,20 +176,17 @@ class: fx-diagram-slide
 
 ::default::
 
-<figure class="deck-figure">
+<figure class="deck-box deck-figure" style="--x: 0; --y: -19.2; --w: 1184; --h: 505.9">
 <img src="/bridge-diagram.svg" alt="Exchange diagram: shell, bridge and screen, with six numbered messages in two phases" />
 </figure>
 
 ---
-layout: none
-class: fx-section-slide
+layout: fabric-section
+eyebrow: Section 03
+summary: The rollout quarter by quarter, the decision it needs, and who carries it.
 ---
 
-<SectionDivider
-  kicker="Section 03"
-  title="What comes next"
-  summary="The rollout quarter by quarter, the decision it needs, and who carries it."
-/>
+# What comes next
 
 ---
 
@@ -184,6 +198,28 @@ class: fx-section-slide
 
 <Timeline />
 
+<!--
+Claim: each quarter closes one reason a project gets written from nothing again.
+
+Not on the slide (answer if asked): the quarter labels are placeholders.
+-->
+
+---
+
+::header::
+
+# Two of five workstreams need a decision
+
+::default::
+
+<StatusBoard />
+
+<!--
+Claim: the plan is mostly on track, and the two rows that are not each wait on one named decision.
+
+What to say: green, amber and red are the template's status colours (v4) and stay small - the status cell and its word, never a row or a heading. Walk the at-risk and blocked rows; the on-track ones need no narration.
+-->
+
 ---
 
 ::header::
@@ -193,6 +229,10 @@ class: fx-section-slide
 ::default::
 
 <OptionCompare />
+
+<!--
+Claim: both starts are reversible. What is not reversible is starting on both at once with the same people.
+-->
 
 ---
 
@@ -208,32 +248,40 @@ class: fx-section-slide
 
 ::header::
 
-# Five consequences
+# Four consequences of one decision
 
 ::default::
 
 <OutcomeCards />
 
+<!--
+Claim: all four follow from one decision - materialize a tested template instead of generating the same project again.
+-->
+
 ---
 layout: fabric-dark
-eyebrow: 'From an adopting team'
 ---
 
 <QuoteBlock />
 
 ---
 layout: fabric-dark
-eyebrow: 'Thank you'
 ---
 
-# Constructor Fabric
+<div class="deck-frame deck-closing-title" style="--x: 48; --y: 201.6; --w: 960">
 
-<ClosingRun />
+# Thank you
+
+</div>
+
+<div class="deck-frame deck-closing-contacts" style="--x: 48; --y: 360; --w: 768">
+  <p>Placeholder Name</p>
+  <p>email@company.com</p>
+  <p>constructor.tech</p>
+</div>
 
 <!--
-Claim: none the deck has not already made - the closing is the invitation and the four steps that follow it.
+Claim: none the deck has not already made.
 
-What to say: which of the four steps this room is being asked to take first, and who to talk to about it.
-
-Not on the slide (answer if asked): dates, and anything the deck did not state before this page.
+What to say: which step this room is being asked to take first, and who to talk to about it: install the CLI, register the shell and the screen template, give the agent one prompt, open the browser.
 -->

@@ -5,8 +5,9 @@ Fabric decks are standalone Slidev projects scaffolded by this skill's `scripts/
 ## Stack and layout
 
 - `slides.md` holds every slide, separated by `---`; diagrams are per-deck Vue components in `components/`.
-- `style.css` is seeded from [../templates/deck-style.css](../templates/deck-style.css) **with `fabric-tokens.css` beside it** - they are a pair; take one without the other and every `var()` resolves to nothing and the deck renders as white boxes.
-- The scaffolded `layouts/` draw the donor zones: `fabric` for a light content slide (navy title, blue takeaway subtitle, hairline footer), `fabric-cover` for the cover, and `fabric-dark` for the other pages on the gradient ground - the quote and the closing. A section divider is the template case rather than a layout: it draws its own zones on `layout: none`.
+- `style.css` carries the template v4 base - frames, layouts and template shapes, every coordinate in `--fx-u` - **with `fabric-tokens.css` beside it**: they are a pair; take one without the other and every `var()` resolves to nothing and the deck renders as white boxes.
+- The `layouts/` place v4's frames absolutely, at the template's own coordinates: `fabric` for a light content slide (title frame at y=52.8, content box from y=163.2, footer frame; `ground: tint` for the Agenda's tint ground), `fabric-cover` (eyebrow, title, subtitle and author from the frontmatter), `fabric-section` (eyebrow and summary from the frontmatter, the `# heading` is the title) and `fabric-dark` for the quote and the closing.
+- [../examples/fabric-deck/v4-reference.md](../examples/fabric-deck/v4-reference.md) rebuilds the template's eleven example slides with these layouts and classes. It is the fixture the style is checked against: render it next to the designer's pages of the same release and the two match within a few pixels.
 
 ## Slide pattern
 
@@ -19,8 +20,6 @@ layout: fabric
 
 # Slide headline
 
-<p class="deck-takeaway">The conclusion the slide supports, stated first.</p>
-
 ::default::
 <OneComponentPerSlide />
 
@@ -32,25 +31,25 @@ Not on the slide: limits, context, what deliberately stays off.
 ```
 
 - One Vue component per slide body; notes in the Claim / What to say / Not on the slide format.
-- **The takeaway line has two legal places, and the slide picks one.** Under the title (`deck-takeaway`, the donors' own shape, EXM sets one on nearly every light slide) where the sentence states the conclusion the slide will support; or under the picture (`deck-takeaway-line`) where the sentence is a conclusion drawn FROM what is above it. The example deck uses the second on every slide that carries one, which is why its headers hold the title alone.
-- Notes are what the block above shows: Claim, What to say, Not on the slide. The example deck's slides 01, 03 and 20 carry them written out.
-- **No eyebrow above a content title.** The header holds the title, and under it the optional blue takeaway line. The caps eyebrow belongs to the dark pages (cover, section divider) and to card heads; over a title it repeats the claim the title already states, and it is what the donors do - no tpl content page has one.
+- **The header holds the title alone.** V4 sets no subtitle under a content title and no takeaway line under the picture; a conclusion the slide supports goes in the title, and anything more in the notes.
+- Notes are what the block above shows: Claim, What to say, Not on the slide.
+- **No eyebrow above a content title.** The caps eyebrow belongs to the dark pages (cover, section divider) and the kicker to card heads.
 - Notes are optional per slide. A slide without them is not a defect, and a review pass must not count one as a miss; what is fixed is the format when they are there.
 - A deck under construction may carry stub slides for content not written yet. While it is being built that is working state, not a placeholder violation - the rule against placeholders applies to the deck as presented.
-- Colour language in diagrams comes from the palette's roles in [fabric-style.md](./fabric-style.md) §1, not from a per-deck convention: navy for structure, titles, table headers and markers; `--fx-blue` for the accented thing on a light ground; `--fx-blue-sky` for the accented thing on a dark one; tints and hairlines for grounds and separation. **Status is words, weight and position - never hue.** Red, green, yellow, purple, magenta and orange are not in the scheme and are not available for any category: one warm pixel reads as another company's deck.
+- Colour language in diagrams comes from the palette's roles in [fabric-style.md](./fabric-style.md) §1, not from a per-deck convention: navy for structure, titles, table headers and markers; `--fx-blue` for the accented thing on a light ground; `--fx-blue-sky` for the accented thing on a dark one; tints and hairlines for grounds and separation; teal and lilac for a second series or a category, sparingly. **Status is carried by the word**; green, amber and red only repeat it, as a status cell, tag or dot (§1.4). Orange, pink, magenta and any other hue are not in the scheme.
 - Text rules: no em dashes (plain "-"), no exclamation marks, "FrontX" spelled exactly. Product slides sell the product's global value, never demo-artifact features, and never another block's/product's content.
 
 ## Footer conventions
 
-- Every content slide closes with the hairline rule, the 10pt bold wordmark "Constructor Fabric" left and the page number right (`.fx-footer`); the cover and the section dividers carry the wordmark without a number.
-- **One footer geometry on every page.** The same band, baseline and padding on light and dark alike: a dark page turns `border-block-start-color` transparent rather than dropping the footer element, and the cover omits only the number. Drop the box on one page and the wordmark shifts when the deck advances - a fault nobody names and everybody feels. The section-divider case draws its own zones, so its wordmark gets the same 7.7% band explicitly.
-- Page numbers are two-digit (01..99) on every page that carries one, with stable width: `font-variant-numeric: tabular-nums; min-inline-size: 20px; text-align: end;` on the number, and the padding happens at the source, in the layout that draws the footer - `String($page.value).padStart(2, '0')`. A Fabric deck owns its footer, so there is nothing to observe and rewrite afterwards.
+- Every page closes with the 10pt bold wordmark "Constructor Fabric" (text at x=57.6) and the page number right-aligned to x=1222.4, both centred in the frame at y=664.3 - **no rule above them**. The cover carries the wordmark without a number; every other page, dark ones included, carries both.
+- **One footer frame on every page**, light and dark alike, so the wordmark holds still as the deck advances.
+- Page numbers are **unpadded** ("7", not "07"), as v4 prints them: the layout writes `{{ $page }}` as it is.
 
 ## Sections, and the nav in the footer
 
 A deck of several parts - often a part per presenter - opens each part with a dark section-divider slide, so the dark ground recurs through the middle of the deck rather than only bookending it.
 
-Where a deck has sections, its **light** pages carry the section names in the footer between the wordmark and the page number, the current one in the accent blue and the rest in the footer grey. A filled or dark page never carries it: cover, divider, quote and closing keep a wordmark-only footer. This is our own convention and not a donor shape - no tpl or exm page has such a nav - so say so if a reviewer asks where it came from.
+Where a deck has sections it MAY carry the section names in the footer of its light pages, between the wordmark and the page number, the current one in the accent blue. This is our own convention and **not a template shape** - v4's footer is the wordmark and the number only - so the example deck ships `sections.ts` empty, which renders nothing. Fill it only when the audience needs the map, and say so if a reviewer asks where it came from.
 
 One declaration feeds both readings, because two lists of section names drift apart:
 
@@ -94,4 +93,4 @@ A deck scaffolded OUTSIDE the skill also carries `"fabricSkill"` in its `package
 
 ## Verification sweep for these decks
 
-Screenshot every touched slide at 1440x900 in a real browser (agent-browser via npx), check: no content overflow on either axis, untouched slides and the agenda unaffected, footer wordmark present, and a two-digit page number on every page but the cover and the section dividers, no warm hue anywhere on the rendered page, `node scripts/check-style.mjs <deck-dir>` clean.
+Screenshot every touched slide at 1440x900 in a real browser (agent-browser via npx), check: no content overflow on either axis, untouched slides and the agenda unaffected, footer wordmark present with no rule above it, an unpadded page number on every page but the cover (section dividers included), no warm hue except a status colour inside a status cell, tag or dot, `node scripts/check-style.mjs <deck-dir>` clean.

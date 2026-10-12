@@ -1,6 +1,6 @@
 # Fabric Presentation
 
-An agent skill that builds Constructor Fabric slide decks in [Slidev](https://sli.dev). It carries the Fabric style as enforceable rules - the monochrome-blue palette, type ladder and composition law derived from the official Fabric templates - plus CSS tokens, worked slide templates, a deck scaffolder, a style checker, a runnable example deck, and export to PDF or a single self-contained HTML file. Point your coding agent at it and ask for a deck; the skill keeps the result on brand.
+An agent skill that builds Constructor Fabric slide decks in [Slidev](https://sli.dev). It carries the Fabric style as enforceable rules - the blue-and-navy palette (designer's template v4), type ladder and composition law derived from the official Fabric templates - plus CSS tokens, worked slide templates, a deck scaffolder, a style checker, a runnable example deck, and export to PDF or a single self-contained HTML file. Point your coding agent at it and ask for a deck; the skill keeps the result on brand.
 
 ## Install
 
